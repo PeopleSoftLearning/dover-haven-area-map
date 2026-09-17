@@ -2,7 +2,7 @@
 
 An area guide for Dover Haven (Unit 4, Dover Mews): a real, live, embedded Google Map guests can drag
 and zoom themselves — every restaurant, pharmacy and shop Google knows about shows up on its own, no
-maintenance needed — plus a small "Lena's picks" strip of hand-picked favourites, each with a
+maintenance needed — plus a small "Host picks" strip of hand-picked favourites, each with a
 description, a walk/drive time, a "Ask about this" WhatsApp button, and a Street View link.
 
 ## Running it locally
@@ -33,7 +33,7 @@ simpler and safer option to start with; embedding is a Lovable change and worth 
 index.html        the page — has the Google Map iframe and the picks strip
 styles.css         Dover Haven brand styling
 app.js             picks/filter logic, and re-centers the map when a pick is clicked
-data/pois.json     the house + every "Lena's pick": name, category, coordinates, time, description, photos
+data/pois.json     the house + every "host pick": name, category, coordinates, time, description, photos
 assets/            drop real photos here
 ```
 
@@ -41,8 +41,8 @@ assets/            drop real photos here
 
 Lena's call, deliberately: a live Google Map already has every restaurant, pharmacy, shop and hotel
 nearby, kept up to date by Google — zero upkeep. The custom part of this page is now just a short list
-of Lena's own favourites (the "picks" in `data/pois.json`), each with her own voice and a way to ask a
-question. Less to maintain, and guests still get the full real map to explore on their own.
+of the host's own favourites (the "picks" in `data/pois.json`), each with a personal note and a way to
+ask a question. Less to maintain, and guests still get the full real map to explore on their own.
 
 ## Adding, editing or removing a "pick"
 
@@ -53,8 +53,8 @@ Open `data/pois.json`. Each entry under `"picks"` looks like this:
   "id": "dover-market",
   "name": "The Dover Market",
   "category": "shop",
-  "lat": 13.0765,
-  "lng": -59.5972,
+  "lat": 13.065869,
+  "lng": -59.565622,
   "timeLabel": "A couple of minutes' walk",
   "description": "Lena's go-to for small groceries...",
   "photos": ["assets/dover-market.jpg"]
@@ -69,9 +69,15 @@ Open `data/pois.json`. Each entry under `"picks"` looks like this:
 - `photos` — points at a file in `assets/` that doesn't exist yet, so the card shows a coloured
   placeholder. Add the real image with that exact filename and it'll show up — no code change needed.
 
-**Coordinates that are still estimates, not GPS-confirmed:** the house itself (`house` in
-`pois.json`) and The Dover Market. Worth dropping exact pins via Google Maps once on-site and updating
-the file — every other distance/time label is copied from Lena's confirmed listing copy.
+**On coordinate accuracy:** The Dover Market's coordinates are exact, decoded from a Google Plus Code
+Lena confirmed. The house's coordinates are derived from that confirmed point plus Lena's own measured
+220 m walking distance to it — accurate to within roughly the width of the block, not survey-precise
+(Dover Haven isn't yet a listed business on Google, so there's no official pin to read directly). Every
+other pick (Dover Beach, St Lawrence Gap, Oistins, the airport, ZR vans) was re-anchored to keep the
+same position *relative to* the corrected house — their absolute coordinates are still estimates,
+though their distance/time labels are all confirmed from Lena's listing copy. Good enough for the
+Street View links and map re-centering this page uses them for; worth tightening later if it matters
+more (e.g. a proper embedded Street View feature).
 
 **Removed, unconfirmed:** an earlier draft of this data included a "South Coast Boardwalk" pick,
 pulled from old listing-copy notes. Lena wasn't sure it's something to send guests to from here, so

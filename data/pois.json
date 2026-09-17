@@ -3,73 +3,89 @@
     "id": "house",
     "name": "Dover Haven",
     "category": "house",
-    "lat": 13.0759,
-    "lng": -59.5975,
+    "lat": 13.06776,
+    "lng": -59.56592,
     "address": "2nd Avenue, Dover, Christ Church, Barbados",
     "timeLabel": "You are here",
     "description": "Unit 4, Dover Mews, 2nd Avenue — three bedrooms, three bathrooms and a study, four minutes on foot from Dover Beach.",
-    "photos": ["assets/house-living-room.jpg", "assets/house-kitchen.jpg", "assets/house-main-bedroom.jpg"]
+    "photos": [
+      "assets/house-living-room.jpg",
+      "assets/house-kitchen.jpg",
+      "assets/house-main-bedroom.jpg"
+    ]
   },
   "picks": [
     {
       "id": "dover-beach",
       "name": "Dover Beach",
       "category": "beach",
-      "lat": 13.0755,
-      "lng": -59.5989,
+      "lat": 13.06736,
+      "lng": -59.56732,
       "timeLabel": "4 min walk · 300 m",
       "description": "Calm, swimmable water with a lifeguard on duty and plenty of natural shade. Down 2nd Avenue, then along Dover Road to the beach access — flat the whole way.",
-      "photos": ["assets/dover-beach.jpg"]
+      "photos": [
+        "assets/dover-beach.jpg"
+      ]
     },
     {
       "id": "dover-market",
       "name": "The Dover Market",
       "category": "shop",
-      "lat": 13.0765,
-      "lng": -59.5972,
-      "timeLabel": "A couple of minutes' walk",
+      "lat": 13.065813,
+      "lng": -59.565563,
+      "timeLabel": "3 min walk · 220 m",
       "description": "Lena's go-to for small groceries — bread, milk, water and the basics, right up the street.",
-      "photos": ["assets/dover-market.jpg"]
+      "photos": [
+        "assets/dover-market.jpg"
+      ]
     },
     {
       "id": "gap",
       "name": "St Lawrence Gap",
       "category": "food",
-      "lat": 13.0722,
-      "lng": -59.5871,
+      "lat": 13.06406,
+      "lng": -59.55552,
       "timeLabel": "Short walk along Dover Road",
       "description": "Restaurants, rum shops and live music — somewhere to eat at almost any hour. Lively in the evening, quiet again by the time you're back in bed.",
-      "photos": ["assets/st-lawrence-gap.jpg"]
+      "photos": [
+        "assets/st-lawrence-gap.jpg"
+      ]
     },
     {
       "id": "oistins",
       "name": "Oistins Fish Fry",
       "category": "food",
-      "lat": 13.0623,
-      "lng": -59.5347,
+      "lat": 13.05416,
+      "lng": -59.50312,
       "timeLabel": "~10 min drive",
       "description": "Go on a Friday night for the fish fry — it's the one thing everybody tells guests to do, and they're right.",
-      "photos": ["assets/oistins.jpg"]
+      "photos": [
+        "assets/oistins.jpg"
+      ]
     },
     {
       "id": "airport",
       "name": "Grantley Adams Airport",
       "category": "transport",
-      "lat": 13.0746,
-      "lng": -59.4925,
+      "lat": 13.06646,
+      "lng": -59.46092,
       "timeLabel": "~15 min",
       "description": "A transfer can be arranged in advance — just ask when you book.",
-      "photos": ["assets/airport.jpg"]
+      "photos": [
+        "assets/airport.jpg"
+      ]
     },
     {
       "id": "zr-vans",
       "name": "Route Taxis & ZR Vans",
       "category": "transport",
-      "lat": 13.0760,
-      "lng": -59.5978,
+      "lat": 13.06786,
+      "lng": -59.56622,
       "timeLabel": "Along the south coast road",
       "description": "Run constantly and cost a couple of dollars — the fastest way to Oistins or Bridgetown if you don't mind a squeeze and loud soca.",
-      "photos": ["assets/zr-van-stop.jpg"]
+      "photos": [
+        "assets/zr-van-stop.jpg"
+      ]
     }
   ]
 }
