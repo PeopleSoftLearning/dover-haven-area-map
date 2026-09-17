@@ -1,0 +1,94 @@
+{
+  "house": {
+    "id": "house",
+    "name": "Dover Haven",
+    "category": "house",
+    "lat": 13.0759,
+    "lng": -59.5975,
+    "timeLabel": "You are here",
+    "description": "Unit 4, Dover Mews, 2nd Avenue — three bedrooms, three bathrooms and a study, four minutes on foot from Dover Beach.",
+    "photos": ["assets/house-living-room.jpg", "assets/house-kitchen.jpg", "assets/house-main-bedroom.jpg"]
+  },
+  "pois": [
+    {
+      "id": "dover-beach",
+      "name": "Dover Beach",
+      "category": "beach",
+      "lat": 13.0755,
+      "lng": -59.5989,
+      "timeLabel": "4 min walk · 300 m",
+      "description": "Calm, swimmable water with a lifeguard on duty and plenty of natural shade. Down 2nd Avenue, then along Dover Road to the beach access — flat the whole way.",
+      "photos": ["assets/dover-beach.jpg"]
+    },
+    {
+      "id": "boardwalk",
+      "name": "South Coast Boardwalk",
+      "category": "beach",
+      "lat": 13.0805,
+      "lng": -59.6070,
+      "timeLabel": "Starts near the end of the road",
+      "description": "Runs about a mile and a half from Rockley to Accra along the coast. The best thing to do at seven in the morning, before it gets hot.",
+      "photos": ["assets/boardwalk.jpg"]
+    },
+    {
+      "id": "gap",
+      "name": "St Lawrence Gap",
+      "category": "food",
+      "lat": 13.0722,
+      "lng": -59.5871,
+      "timeLabel": "Short walk along Dover Road",
+      "description": "Restaurants, rum shops and live music — somewhere to eat at almost any hour. Lively in the evening, quiet again by the time you're back in bed.",
+      "photos": ["assets/st-lawrence-gap.jpg"]
+    },
+    {
+      "id": "oistins",
+      "name": "Oistins Fish Fry",
+      "category": "food",
+      "lat": 13.0623,
+      "lng": -59.5347,
+      "timeLabel": "~10 min drive",
+      "description": "Go on a Friday night for the fish fry — it's the one thing everybody tells guests to do, and they're right.",
+      "photos": ["assets/oistins.jpg"]
+    },
+    {
+      "id": "supermarket",
+      "name": "Supermarket",
+      "category": "shop",
+      "lat": 13.0778,
+      "lng": -59.6001,
+      "timeLabel": "A few minutes' drive",
+      "description": "The nearest full supermarket for a proper grocery run before settling in. Update the pin with the exact store once confirmed.",
+      "photos": ["assets/supermarket.jpg"]
+    },
+    {
+      "id": "corner-shop",
+      "name": "Corner Shop",
+      "category": "shop",
+      "lat": 13.0763,
+      "lng": -59.5960,
+      "timeLabel": "Closer, walkable",
+      "description": "A smaller shop nearby for milk, bread and the things you don't want to drive for. Update the pin with the exact shop once confirmed.",
+      "photos": ["assets/corner-shop.jpg"]
+    },
+    {
+      "id": "airport",
+      "name": "Grantley Adams Airport",
+      "category": "transport",
+      "lat": 13.0746,
+      "lng": -59.4925,
+      "timeLabel": "~15 min",
+      "description": "A transfer can be arranged in advance — just ask when you book.",
+      "photos": ["assets/airport.jpg"]
+    },
+    {
+      "id": "zr-vans",
+      "name": "Route Taxis & ZR Vans",
+      "category": "transport",
+      "lat": 13.0760,
+      "lng": -59.5978,
+      "timeLabel": "Along the south coast road",
+      "description": "Run constantly and cost a couple of dollars — the fastest way to Oistins or Bridgetown if you don't mind a squeeze and loud soca.",
+      "photos": ["assets/zr-van-stop.jpg"]
+    }
+  ]
+}

@@ -1,0 +1,435 @@
+<title>Dover Haven Area Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF7EF;
+    --sand:#EFE3CC;
+    --water:#DCE3F1;
+    --water-deep:#C4D0E9;
+    --ink:#3A362E;
+    --muted:#8A806E;
+    --line: rgba(58,54,46,0.14);
+    --mark:#7C87C4;
+    --accent:#55619E;
+    --accent-ink:#FBF7EF;
+    --card-bg:#FFFFFF;
+    --card-shadow: 0 18px 40px -18px rgba(58,54,46,0.35);
+    --cat-beach:#3E7691;
+    --cat-food:#55619E;
+    --cat-shop:#9C7245;
+    --cat-transport:#6E7180;
+    --pin-ring: rgba(124,135,196,0.25);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --cream:#211F2E;
+      --sand:#2B2942;
+      --water:#181A2C;
+      --water-deep:#12131F;
+      --ink:#F1EDE1;
+      --muted:#B4A99A;
+      --line: rgba(241,237,225,0.14);
+      --mark:#A6AEDD;
+      --accent:#9AA3D9;
+      --accent-ink:#1B1930;
+      --card-bg:#2A2840;
+      --card-shadow: 0 18px 40px -18px rgba(0,0,0,0.6);
+      --cat-beach:#6FB0CE;
+      --cat-food:#9AA3D9;
+      --cat-shop:#D1A574;
+      --cat-transport:#A6A9BE;
+      --pin-ring: rgba(166,174,221,0.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --cream:#211F2E;
+    --sand:#2B2942;
+    --water:#181A2C;
+    --water-deep:#12131F;
+    --ink:#F1EDE1;
+    --muted:#B4A99A;
+    --line: rgba(241,237,225,0.14);
+    --mark:#A6AEDD;
+    --accent:#9AA3D9;
+    --accent-ink:#1B1930;
+    --card-bg:#2A2840;
+    --card-shadow: 0 18px 40px -18px rgba(0,0,0,0.6);
+    --cat-beach:#6FB0CE;
+    --cat-food:#9AA3D9;
+    --cat-shop:#D1A574;
+    --cat-transport:#A6A9BE;
+    --pin-ring: rgba(166,174,221,0.3);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Karla', ui-sans-serif, system-ui, sans-serif;
+    padding-inline:16px;
+    padding-block: max(18px, env(safe-area-inset-top,0px)) max(28px, env(safe-area-inset-bottom,0px));
+    display:flex;
+    justify-content:center;
+  }
+  .page{ width:100%; max-width:780px; }
+
+  h1,h2,h3{ font-family:'Newsreader', Georgia, 'Times New Roman', serif; font-weight:500; margin:0; text-wrap:balance; }
+
+  header.top{
+    display:flex; flex-direction:column; gap:4px; margin-bottom:14px;
+  }
+  .eyebrow{
+    font-family:'Karla', sans-serif; font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--accent); font-weight:700;
+  }
+  header.top h1{ font-size:clamp(24px,5vw,30px); color:var(--ink); }
+  header.top p{ margin:2px 0 0; color:var(--muted); font-size:14px; max-width:56ch; }
+
+  .filters{
+    display:flex; gap:8px; overflow-x:auto; padding-block:10px 4px; margin-bottom:12px;
+    scrollbar-width:none;
+  }
+  .filters::-webkit-scrollbar{ display:none; }
+  .chip{
+    flex:none; border:1px solid var(--line); background:var(--card-bg); color:var(--ink);
+    font-family:'Karla',sans-serif; font-size:13px; font-weight:600; padding:7px 14px; border-radius:999px;
+    cursor:pointer; display:flex; align-items:center; gap:6px; transition:background .15s, color .15s, border-color .15s;
+  }
+  .chip .dot{ width:8px; height:8px; border-radius:50%; background:var(--dot,var(--muted)); flex:none; }
+  .chip[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .chip[aria-pressed="true"] .dot{ background:var(--accent-ink); }
+  .chip:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .map-wrap{
+    position:relative; width:100%; aspect-ratio: 4 / 5; border-radius:20px; overflow:hidden;
+    border:1px solid var(--line); box-shadow:var(--card-shadow); background:var(--sand);
+  }
+  @media (min-width:600px){ .map-wrap{ aspect-ratio: 16/11; } }
+
+  .map-bg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+
+  .pin{
+    position:absolute; transform:translate(-50%,-100%); background:none; border:none; padding:0; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; z-index:2;
+  }
+  .pin .bubble{
+    width:34px; height:34px; border-radius:50% 50% 50% 4px; transform:rotate(45deg);
+    background:var(--cat, var(--accent)); border:2.5px solid var(--card-bg);
+    box-shadow:0 6px 14px -6px rgba(0,0,0,0.45);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .15s ease;
+  }
+  .pin .bubble svg{ transform:rotate(-45deg); width:15px; height:15px; }
+  .pin[aria-pressed="true"] .bubble{ transform:rotate(45deg) scale(1.18); box-shadow:0 0 0 6px var(--pin-ring), 0 6px 14px -6px rgba(0,0,0,0.45); }
+  .pin .label{
+    margin-top:4px; font-size:10.5px; font-weight:700; color:var(--ink); background:var(--card-bg);
+    padding:2px 6px; border-radius:6px; white-space:nowrap; box-shadow:0 2px 6px -2px rgba(0,0,0,0.25);
+    opacity:0; pointer-events:none; transition:opacity .15s ease;
+  }
+  .map-wrap:hover .pin .label, .pin:focus-visible .label, .pin[aria-pressed="true"] .label{ opacity:1; }
+
+  .pin.house .bubble{
+    width:44px; height:44px; background:var(--mark); border-width:3px;
+  }
+  .pin.house .label{ opacity:1; font-size:11.5px; }
+
+  .map-caption{
+    display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-top:8px;
+    font-size:11px; color:var(--muted); letter-spacing:0.02em;
+  }
+
+  .panel{
+    margin-top:14px; background:var(--card-bg); border:1px solid var(--line); border-radius:18px;
+    box-shadow:var(--card-shadow); overflow:hidden;
+  }
+  .panel .photo{
+    position:relative; aspect-ratio: 16/8; width:100%;
+    background: linear-gradient(135deg, var(--cat, var(--accent)) 0%, color-mix(in srgb, var(--cat, var(--accent)) 55%, var(--card-bg)) 100%);
+    display:flex; align-items:center; justify-content:center; color:var(--accent-ink);
+  }
+  .panel .photo svg{ width:15%; max-width:56px; opacity:0.85; }
+  .panel .photo .ph-tag{
+    position:absolute; bottom:10px; left:12px; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase;
+    background:rgba(0,0,0,0.28); color:#fff; padding:3px 8px; border-radius:6px; font-weight:700;
+  }
+  .photo-nav{ position:absolute; inset:0; display:flex; align-items:center; justify-content:space-between; padding:0 8px; }
+  .photo-nav button{
+    pointer-events:auto; background:rgba(0,0,0,0.28); color:#fff; border:none; width:30px; height:30px; border-radius:50%;
+    font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1;
+  }
+  .photo-dots{ position:absolute; bottom:10px; right:12px; display:flex; gap:5px; }
+  .photo-dots span{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.5); }
+  .photo-dots span.on{ background:#fff; }
+
+  .panel .body{ padding:16px 18px 18px; display:flex; flex-direction:column; gap:10px; }
+  .panel .row1{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .panel h2{ font-size:20px; color:var(--ink); }
+  .panel .cat-tag{
+    font-size:10.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--cat,var(--accent));
+  }
+  .close-btn{
+    flex:none; background:var(--sand); border:none; width:28px; height:28px; border-radius:50%; cursor:pointer;
+    color:var(--muted); font-size:15px; display:flex; align-items:center; justify-content:center;
+  }
+  .close-btn:hover{ color:var(--ink); }
+  .time-badge{
+    align-self:flex-start; font-size:12.5px; font-weight:600; color:var(--accent); background:color-mix(in srgb, var(--accent) 14%, var(--card-bg));
+    padding:4px 10px; border-radius:999px;
+  }
+  .panel p.desc{ margin:0; font-size:14.5px; line-height:1.55; color:var(--ink); max-width:60ch; }
+  .cta{
+    margin-top:4px; align-self:flex-start; display:inline-flex; align-items:center; gap:7px;
+    background:var(--accent); color:var(--accent-ink); text-decoration:none; font-weight:700; font-size:13.5px;
+    padding:10px 16px; border-radius:10px; transition:opacity .15s;
+  }
+  .cta:hover{ opacity:0.88; }
+  .cta svg{ width:15px; height:15px; }
+
+  footer.credit{ margin-top:16px; text-align:center; font-size:11.5px; color:var(--muted); }
+  footer.credit a{ color:var(--accent); }
+</style>
+
+<div class="page">
+  <header class="top">
+    <span class="eyebrow">Dover Haven · Area Guide</span>
+    <h1>What's around the house</h1>
+    <p>Everything walkable or a short drive from Unit 4, Dover Mews — tap a pin for photos, distance and how to ask about it.</p>
+  </header>
+
+  <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
+
+  <div class="map-wrap" id="mapWrap">
+    <svg class="map-bg" viewBox="0 0 1000 750" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="landGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--cream)"/>
+          <stop offset="100%" stop-color="var(--sand)"/>
+        </linearGradient>
+        <linearGradient id="seaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--water)"/>
+          <stop offset="100%" stop-color="var(--water-deep)"/>
+        </linearGradient>
+      </defs>
+      <rect width="1000" height="750" fill="url(#landGrad)"/>
+      <path d="M0,560 C160,520 300,600 480,560 C650,522 760,600 1000,548 L1000,750 L0,750 Z" fill="url(#seaGrad)"/>
+      <path d="M0,560 C160,520 300,600 480,560 C650,522 760,600 1000,548" fill="none" stroke="var(--water-deep)" stroke-width="3" opacity="0.5"/>
+      <!-- roads -->
+      <g fill="none" stroke="var(--card-bg)" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+        <path d="M470,40 L470,560" stroke-width="16"/>
+        <path d="M60,470 L940,430" stroke-width="14"/>
+        <path d="M300,120 L300,300" stroke-width="10"/>
+        <path d="M620,90 L620,260" stroke-width="10"/>
+      </g>
+      <g fill="none" stroke="var(--muted)" stroke-width="1" opacity="0.55" font-family="Karla, sans-serif">
+        <path d="M470,40 L470,560"/>
+      </g>
+      <g font-family="Karla, sans-serif" font-size="12" fill="var(--muted)" letter-spacing="0.5">
+        <text x="486" y="200" transform="rotate(90 486 200)">2nd Avenue</text>
+        <text x="700" y="420" transform="rotate(-2.5 700 420)">Dover Road</text>
+        <text x="330" y="200" transform="rotate(90 330 200)">1st Avenue</text>
+      </g>
+      <!-- walking dashed path house -> beach -->
+      <path d="M470,300 L470,450 L200,480" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="0.1 10" stroke-linecap="round" opacity="0.85"/>
+      <text x="998" y="738" font-size="10" fill="var(--muted)" text-anchor="end" letter-spacing="1">NOT TO SCALE</text>
+    </svg>
+
+    <div id="pinLayer"></div>
+  </div>
+
+  <div class="map-caption">
+    <span>Illustrative map, not to scale</span>
+    <span>Tap a pin to open it</span>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <footer class="credit">Questions about any of these? <a href="https://wa.me/12462613007" target="_blank" rel="noopener">WhatsApp Alison</a>, your local host.</footer>
+</div>
+
+<script>
+(function(){
+  var WHATSAPP = "https://wa.me/12462613007";
+
+  var ICONS = {
+    house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>',
+    beach: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 21c3-2 6-2 9 0s6 2 9 0"/><path d="M12 3v9"/><path d="M8 7l4-4 4 4"/></svg>',
+    food: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2v8a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M17 2c-2 2-2 6-2 8s0 2 2 2 2 0 2-2-0-6-2-8z"/><path d="M17 14v8"/></svg>',
+    shop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1.5 11H5.5z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>',
+    transport: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l19-9-9 19-2-8z"/></svg>'
+  };
+
+  var CATS = [
+    {id:"beach", label:"Beach & boardwalk", varname:"--cat-beach"},
+    {id:"food", label:"Food & nightlife", varname:"--cat-food"},
+    {id:"shop", label:"Shopping & essentials", varname:"--cat-shop"},
+    {id:"transport", label:"Getting around", varname:"--cat-transport"}
+  ];
+
+  var POIS = [
+    {
+      id:"house", cat:"house", x:47, y:35, name:"Dover Haven",
+      timeLabel:"You are here", desc:"Unit 4, Dover Mews, 2nd Avenue — three bedrooms, three bathrooms and a study, four minutes on foot from Dover Beach.",
+      photos:["Living room","Kitchen","Main bedroom"]
+    },
+    {
+      id:"dover-beach", cat:"beach", x:20, y:64, name:"Dover Beach",
+      timeLabel:"4 min walk · 300 m", desc:"Calm, swimmable water with a lifeguard on duty and plenty of natural shade. Down 2nd Avenue, then along Dover Road to the beach access — flat the whole way.",
+      photos:["Dover Beach"]
+    },
+    {
+      id:"boardwalk", cat:"beach", x:62, y:58, name:"South Coast Boardwalk",
+      timeLabel:"Starts near the end of the road", desc:"Runs about a mile and a half from Rockley to Accra along the coast. The best thing to do at seven in the morning, before it gets hot.",
+      photos:["Boardwalk"]
+    },
+    {
+      id:"gap", cat:"food", x:87, y:47, name:"St Lawrence Gap",
+      timeLabel:"Short walk along Dover Road", desc:"Restaurants, rum shops and live music — somewhere to eat at almost any hour. Lively in the evening, quiet again by the time you're back in bed.",
+      photos:["St Lawrence Gap"]
+    },
+    {
+      id:"oistins", cat:"food", x:95, y:66, name:"Oistins Fish Fry",
+      timeLabel:"~10 min drive", desc:"Go on a Friday night for the fish fry — it's the one thing everybody tells guests to do, and they're right.",
+      photos:["Oistins"]
+    },
+    {
+      id:"supermarket", cat:"shop", x:31, y:20, name:"Supermarket",
+      timeLabel:"A few minutes' drive", desc:"The nearest full supermarket for a proper grocery run before settling in.",
+      photos:["Supermarket"]
+    },
+    {
+      id:"corner-shop", cat:"shop", x:63, y:14, name:"Corner Shop",
+      timeLabel:"Closer, walkable", desc:"A smaller shop nearby for milk, bread and the things you don't want to drive for.",
+      photos:["Corner shop"]
+    },
+    {
+      id:"airport", cat:"transport", x:94, y:32, name:"Grantley Adams Airport",
+      timeLabel:"~15 min", desc:"A transfer can be arranged in advance — just ask when you book.",
+      photos:["Airport"]
+    },
+    {
+      id:"zr-vans", cat:"transport", x:47, y:12, name:"Route Taxis & ZR Vans",
+      timeLabel:"Along the south coast road", desc:"Run constantly and cost a couple of dollars — the fastest way to Oistins or Bridgetown if you don't mind a squeeze and loud soca.",
+      photos:["ZR van stop"]
+    }
+  ];
+
+  var filtersEl = document.getElementById("filters");
+  var pinLayer = document.getElementById("pinLayer");
+  var panel = document.getElementById("panel");
+  var activeCat = "all";
+  var openId = null;
+  var photoIndex = {};
+
+  function catColorVar(cat){
+    if(cat === "house") return "var(--mark)";
+    var c = CATS.filter(function(c){ return c.id===cat; })[0];
+    return c ? "var("+c.varname+")" : "var(--accent)";
+  }
+
+  function renderFilters(){
+    var chips = [{id:"all", label:"All"}].concat(CATS);
+    filtersEl.innerHTML = chips.map(function(c){
+      var dotStyle = c.id==="all" ? "" : ' style="--dot:var('+c.varname+')"';
+      var pressed = c.id === activeCat;
+      return '<button class="chip" data-cat="'+c.id+'" aria-pressed="'+pressed+'"'+dotStyle+'>' +
+        (c.id!=="all" ? '<span class="dot"></span>' : '') + c.label + '</button>';
+    }).join("");
+  }
+
+  function renderPins(){
+    pinLayer.innerHTML = POIS.map(function(p){
+      var visible = activeCat === "all" || p.cat === activeCat || p.cat === "house";
+      var isOpen = p.id === openId;
+      return '<button class="pin '+(p.cat==="house"?"house":"")+'" data-id="'+p.id+'" ' +
+        'aria-pressed="'+isOpen+'" style="left:'+p.x+'%; top:'+p.y+'%; '+(visible?"":"display:none;")+'">' +
+        '<span class="bubble" style="--cat:'+catColorVar(p.cat)+'">'+ ICONS[p.cat] +'</span>' +
+        '<span class="label">'+p.name+'</span></button>';
+    }).join("");
+  }
+
+  function photoIcon(cat){
+    return ICONS[cat] || ICONS.house;
+  }
+
+  function renderPanel(){
+    if(!openId){ panel.innerHTML = ""; panel.style.display = "none"; return; }
+    panel.style.display = "";
+    var p = POIS.filter(function(x){ return x.id === openId; })[0];
+    if(!p) return;
+    var idx = photoIndex[p.id] || 0;
+    var multi = p.photos.length > 1;
+    var nav = multi ? (
+      '<div class="photo-nav"><button data-nav="prev" aria-label="Previous photo">&#8249;</button>' +
+      '<button data-nav="next" aria-label="Next photo">&#8250;</button></div>' +
+      '<div class="photo-dots">' + p.photos.map(function(_,i){ return '<span class="'+(i===idx?"on":"")+'"></span>'; }).join("") + '</div>'
+    ) : "";
+    var catInfo = CATS.filter(function(c){ return c.id===p.cat; })[0];
+    var catLabel = p.cat === "house" ? "Dover Haven" : (catInfo ? catInfo.label : "");
+    panel.innerHTML =
+      '<div class="photo" style="--cat:'+catColorVar(p.cat)+'">' +
+        photoIcon(p.cat) +
+        '<span class="ph-tag">' + p.photos[idx] + ' · add photo</span>' +
+        nav +
+      '</div>' +
+      '<div class="body">' +
+        '<div class="row1">' +
+          '<div><div class="cat-tag" style="--cat:'+catColorVar(p.cat)+'">' + catLabel + '</div><h2>'+p.name+'</h2></div>' +
+          '<button class="close-btn" aria-label="Close">&times;</button>' +
+        '</div>' +
+        '<span class="time-badge">' + p.timeLabel + '</span>' +
+        '<p class="desc">' + p.desc + '</p>' +
+        '<a class="cta" href="' + WHATSAPP + '?text=' + encodeURIComponent("Hi! I had a question about " + p.name + " near Dover Haven.") + '" target="_blank" rel="noopener">' +
+          '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1s-.6.8-.7.9c-.1.1-.3.2-.5.1a6.5 6.5 0 0 1-1.9-1.2 7.1 7.1 0 0 1-1.3-1.6c-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4a.5.5 0 0 0 0-.5c-.1-.1-.5-1.3-.7-1.7-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.9 2 4.7 4.7 0 0 0 1 2.5 10.7 10.7 0 0 0 4.1 3.6c.6.2 1 .4 1.4.5a3.4 3.4 0 0 0 1.5.1 2.5 2.5 0 0 0 1.6-1.1 1.9 1.9 0 0 0 .1-1.1c-.1-.1-.2-.2-.4-.3z"/></svg>' +
+          'Ask about ' + p.name +
+        '</a>' +
+      '</div>';
+  }
+
+  function openPin(id){
+    openId = id;
+    photoIndex[id] = photoIndex[id] || 0;
+    renderPins();
+    renderPanel();
+    panel.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+  function closePanel(){
+    openId = null;
+    renderPins();
+    renderPanel();
+  }
+
+  filtersEl.addEventListener("click", function(e){
+    var btn = e.target.closest(".chip");
+    if(!btn) return;
+    activeCat = btn.getAttribute("data-cat");
+    renderFilters();
+    renderPins();
+  });
+
+  pinLayer.addEventListener("click", function(e){
+    var btn = e.target.closest(".pin");
+    if(!btn) return;
+    var id = btn.getAttribute("data-id");
+    if(openId === id){ closePanel(); } else { openPin(id); }
+  });
+
+  panel.addEventListener("click", function(e){
+    if(e.target.closest(".close-btn")){ closePanel(); return; }
+    var nav = e.target.closest("[data-nav]");
+    if(nav && openId){
+      var p = POIS.filter(function(x){ return x.id === openId; })[0];
+      var idx = photoIndex[openId] || 0;
+      var dir = nav.getAttribute("data-nav") === "next" ? 1 : -1;
+      idx = (idx + dir + p.photos.length) % p.photos.length;
+      photoIndex[openId] = idx;
+      renderPanel();
+    }
+  });
+
+  renderFilters();
+  renderPins();
+  openPin("house");
+})();
+</script>
