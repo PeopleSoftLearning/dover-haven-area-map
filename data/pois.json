@@ -5,11 +5,12 @@
     "category": "house",
     "lat": 13.0759,
     "lng": -59.5975,
+    "address": "2nd Avenue, Dover, Christ Church, Barbados",
     "timeLabel": "You are here",
     "description": "Unit 4, Dover Mews, 2nd Avenue — three bedrooms, three bathrooms and a study, four minutes on foot from Dover Beach.",
     "photos": ["assets/house-living-room.jpg", "assets/house-kitchen.jpg", "assets/house-main-bedroom.jpg"]
   },
-  "pois": [
+  "picks": [
     {
       "id": "dover-beach",
       "name": "Dover Beach",
@@ -21,14 +22,14 @@
       "photos": ["assets/dover-beach.jpg"]
     },
     {
-      "id": "boardwalk",
-      "name": "South Coast Boardwalk",
-      "category": "beach",
-      "lat": 13.0805,
-      "lng": -59.6070,
-      "timeLabel": "Starts near the end of the road",
-      "description": "Runs about a mile and a half from Rockley to Accra along the coast. The best thing to do at seven in the morning, before it gets hot.",
-      "photos": ["assets/boardwalk.jpg"]
+      "id": "dover-market",
+      "name": "The Dover Market",
+      "category": "shop",
+      "lat": 13.0765,
+      "lng": -59.5972,
+      "timeLabel": "A couple of minutes' walk",
+      "description": "Lena's go-to for small groceries — bread, milk, water and the basics, right up the street.",
+      "photos": ["assets/dover-market.jpg"]
     },
     {
       "id": "gap",
@@ -49,26 +50,6 @@
       "timeLabel": "~10 min drive",
       "description": "Go on a Friday night for the fish fry — it's the one thing everybody tells guests to do, and they're right.",
       "photos": ["assets/oistins.jpg"]
-    },
-    {
-      "id": "supermarket",
-      "name": "Supermarket",
-      "category": "shop",
-      "lat": 13.0778,
-      "lng": -59.6001,
-      "timeLabel": "A few minutes' drive",
-      "description": "The nearest full supermarket for a proper grocery run before settling in. Update the pin with the exact store once confirmed.",
-      "photos": ["assets/supermarket.jpg"]
-    },
-    {
-      "id": "corner-shop",
-      "name": "Corner Shop",
-      "category": "shop",
-      "lat": 13.0763,
-      "lng": -59.5960,
-      "timeLabel": "Closer, walkable",
-      "description": "A smaller shop nearby for milk, bread and the things you don't want to drive for. Update the pin with the exact shop once confirmed.",
-      "photos": ["assets/corner-shop.jpg"]
     },
     {
       "id": "airport",

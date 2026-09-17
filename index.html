@@ -7,37 +7,37 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="page">
     <header class="top">
       <span class="eyebrow">Dover Haven &middot; Area Guide</span>
-      <h1>What's around the house</h1>
-      <p>Everything walkable or a short drive from Unit 4, Dover Mews — tap a pin for photos, distance and how to ask about it.</p>
+      <h1>Explore the area</h1>
+      <p>Drag or zoom the map like any Google Map — every restaurant, pharmacy and shop nearby shows up on its own. Below it, a few of Lena's own picks.</p>
     </header>
 
+    <div class="map-wrap">
+      <iframe id="gmap" class="gmap" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps?q=2nd+Avenue,+Dover,+Christ+Church,+Barbados&output=embed"></iframe>
+    </div>
+    <div class="map-caption">
+      <span id="mapLabel">Showing: Dover Haven</span>
+      <a id="fullMapLink" href="https://www.google.com/maps?q=2nd+Avenue,+Dover,+Christ+Church,+Barbados" target="_blank" rel="noopener">Open in Google Maps &rarr;</a>
+    </div>
+
+    <h2 class="picks-heading">Lena's picks</h2>
     <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
 
-    <div class="map-wrap">
-      <div id="map"></div>
-    </div>
-
-    <div class="map-caption">
-      <span>Real map &middot; OpenStreetMap</span>
-      <span>Tap a pin to open it</span>
-    </div>
+    <div class="picks" id="picks"></div>
 
     <div class="panel" id="panel"></div>
 
     <footer class="credit">
       Questions about any of these? <a href="https://wa.me/12462613007" target="_blank" rel="noopener">WhatsApp Alison</a>, your local host.
-      <br>Map data &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors.
     </footer>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="app.js"></script>
 </body>
 </html>

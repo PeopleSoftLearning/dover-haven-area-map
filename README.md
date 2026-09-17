@@ -1,21 +1,13 @@
 # Dover Haven — Area Map
 
-An interactive map of Dover Haven (Unit 4, Dover Mews) and everything nearby — beach, restaurants,
-shops, transport — built like Snap Maps / IG Maps: pins on a map, tap a pin to see a photo, distance,
-description, and a button to ask a question.
-
-Two versions of this exist:
-
-- **This repo** — a real, literal map using [Leaflet](https://leafletjs.com/) + free
-  [OpenStreetMap](https://www.openstreetmap.org/) tiles. No API key, no billing. This is the one to
-  keep developing (add pins, swap in real photos, change categories).
-- A quick **illustrated preview** (no real map tiles, just a styled graphic) was published as a Claude
-  artifact for a fast first look — ask Lena for the link if you want to see it, but this repo is the
-  one to build on.
+An area guide for Dover Haven (Unit 4, Dover Mews): a real, live, embedded Google Map guests can drag
+and zoom themselves — every restaurant, pharmacy and shop Google knows about shows up on its own, no
+maintenance needed — plus a small "Lena's picks" strip of hand-picked favourites, each with a
+description, a walk/drive time, a "Ask about this" WhatsApp button, and a Street View link.
 
 ## Running it locally
 
-This needs a local web server (not just double-clicking `index.html`), because the browser blocks
+Needs a local web server (not just double-clicking `index.html`), because the browser blocks
 `fetch()` of local files otherwise. From this folder:
 
 ```bash
@@ -23,77 +15,84 @@ python3 -m http.server 8000
 # then open http://localhost:8000
 ```
 
-or, with Node installed:
-
-```bash
-npx serve .
-```
+or, with Node installed: `npx serve .`
 
 ## Deploying it for free (GitHub Pages)
 
-1. Push this repo to GitHub (see below).
-2. In the repo on GitHub: **Settings → Pages → Source → Deploy from a branch → `main` / `(root)`**.
+1. Push this repo to GitHub (already done if you're reading this from the repo).
+2. In the repo: **Settings → Pages → Source → Deploy from a branch → `main` / `(root)`**.
 3. GitHub gives you a live URL in a minute or two, e.g. `https://<username>.github.io/dover-haven-area-map/`.
 
-That URL can later be linked from — or embedded via `<iframe>` in — the main Dover Haven site.
+That URL can be linked from — or later embedded via `<iframe>` in — the main Dover Haven site
+(doverhavenbarbados.com). Linking to it (a plain "Explore the area" button/link on the site) is the
+simpler and safer option to start with; embedding is a Lovable change and worth doing carefully.
 
 ## Project structure
 
 ```
-index.html        the page itself
-styles.css         Dover Haven brand styling (colours, fonts, cards)
-app.js             all the map/pin/filter logic — reads data/pois.json
-data/pois.json     every pin: name, category, coordinates, distance/time, description, photos
-assets/            drop real photos here (see below)
+index.html        the page — has the Google Map iframe and the picks strip
+styles.css         Dover Haven brand styling
+app.js             picks/filter logic, and re-centers the map when a pick is clicked
+data/pois.json     the house + every "Lena's pick": name, category, coordinates, time, description, photos
+assets/            drop real photos here
 ```
 
-## Adding or editing a pin
+## Why an embedded Google Map instead of custom pins for everything
 
-Open `data/pois.json`. Each entry looks like this:
+Lena's call, deliberately: a live Google Map already has every restaurant, pharmacy, shop and hotel
+nearby, kept up to date by Google — zero upkeep. The custom part of this page is now just a short list
+of Lena's own favourites (the "picks" in `data/pois.json`), each with her own voice and a way to ask a
+question. Less to maintain, and guests still get the full real map to explore on their own.
+
+## Adding, editing or removing a "pick"
+
+Open `data/pois.json`. Each entry under `"picks"` looks like this:
 
 ```json
 {
-  "id": "dover-beach",
-  "name": "Dover Beach",
-  "category": "beach",
-  "lat": 13.0755,
-  "lng": -59.5989,
-  "timeLabel": "4 min walk · 300 m",
-  "description": "Calm, swimmable water with a lifeguard on duty...",
-  "photos": ["assets/dover-beach.jpg"]
+  "id": "dover-market",
+  "name": "The Dover Market",
+  "category": "shop",
+  "lat": 13.0765,
+  "lng": -59.5972,
+  "timeLabel": "A couple of minutes' walk",
+  "description": "Lena's go-to for small groceries...",
+  "photos": ["assets/dover-market.jpg"]
 }
 ```
 
-- `category` must be one of: `beach`, `food`, `shop`, `transport` (or `house` — only the property itself uses that one).
-  Add a new category by adding it to the `CATS` array near the top of `app.js` and giving it a colour
-  variable in `styles.css` (copy the `--cat-*` pattern).
-- `lat` / `lng` — right-click any spot on [Google Maps](https://maps.google.com) or
-  [OpenStreetMap](https://www.openstreetmap.org) and copy the coordinates it shows.
-- `photos` — an array of image paths. Right now they point at files that don't exist yet, so the map
-  shows a coloured placeholder card instead. Add a real image to `assets/`, e.g. `assets/dover-beach.jpg`,
-  and it'll show up automatically — no code changes needed.
+- `category` must be one of: `beach`, `food`, `shop`, `transport`. Add a new one by adding it to the
+  `CATS` array near the top of `app.js` and giving it a colour variable in `styles.css` (copy the
+  `--cat-*` pattern).
+- `lat` / `lng` — used for the Street View link and to re-center the map when this pick is clicked.
+  Right-click any spot on [Google Maps](https://maps.google.com) and copy the coordinates it shows.
+- `photos` — points at a file in `assets/` that doesn't exist yet, so the card shows a coloured
+  placeholder. Add the real image with that exact filename and it'll show up — no code change needed.
 
-**The house pin's coordinates in `data/pois.json` are an estimate** (Dover Mews, 2nd Avenue). Worth
-dropping an exact pin on Google Maps once you're on-site and updating `lat`/`lng` for `house` — every
-other distance/time label is copied from the confirmed listing copy, but the pin position itself hasn't
-been GPS-verified.
+**Coordinates that are still estimates, not GPS-confirmed:** the house itself (`house` in
+`pois.json`) and The Dover Market. Worth dropping exact pins via Google Maps once on-site and updating
+the file — every other distance/time label is copied from Lena's confirmed listing copy.
 
-## Upgrading to Google Maps / Street View later
+**Removed, unconfirmed:** an earlier draft of this data included a "South Coast Boardwalk" pick,
+pulled from old listing-copy notes. Lena wasn't sure it's something to send guests to from here, so
+it's been taken out. Add it back into `data/pois.json` if it turns out to be real and relevant.
 
-If you want the literal Street View look, swap the Leaflet tile layer in `app.js` for the
-[Google Maps JavaScript API](https://developers.google.com/maps/documentation/javascript/overview) —
-it needs a Google Cloud project, an API key, and billing enabled (Google gives a monthly free credit
-that comfortably covers a single-property site, but a card has to be on file). Everything else —
-`data/pois.json`, the filter chips, the pin cards, the WhatsApp button — carries over unchanged.
+## Street View
+
+Each pick's "Street View →" button opens Google's own Street View at that pin's coordinates, in a new
+tab — free, no API key. An embedded Street View panel directly on the page (so guests never leave it)
+is also possible, but needs the Google Maps JavaScript API — a Google Cloud project, an API key, and
+billing enabled (there's a monthly free credit that easily covers a single-property site, but a card
+has to be on file). Worth doing once the simple version proves useful.
 
 ## Ask-a-question button
 
-Every pin's card links to WhatsApp (`https://wa.me/12462613007`) with the place's name pre-filled in
-the message, same number as the "WhatsApp Alison" link on the main site's footer. Change the number in
-`app.js` (search for `WHATSAPP`) if that should be a different contact.
+Every pick's card links to WhatsApp (`https://wa.me/12462613007`) with the place's name pre-filled,
+same number as the "WhatsApp Alison" link on the main site's footer. Change the number in `app.js`
+(search for `WHATSAPP`) if that should be a different contact.
 
 ## Optional: an on-site "ask about the area" assistant
 
-The idea Jordan raised of an LLM that answers guest questions about the property and area is a
-separate, larger piece of work (needs a backend to hold an API key and answer safely) — not something
-this static map includes yet. Worth a separate conversation once the map itself is live.
+Jordan's idea of an LLM that answers guest questions about the property and area directly is a
+separate, larger piece of work (needs a backend to hold an API key and answer safely) — not included
+here. Worth a separate conversation once the map itself is live and settled.

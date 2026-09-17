@@ -13,7 +13,6 @@
   --cat-food:#55619E;
   --cat-shop:#9C7245;
   --cat-transport:#6E7180;
-  --pin-ring: rgba(124,135,196,0.25);
 }
 @media (prefers-color-scheme: dark){
   :root{
@@ -31,28 +30,35 @@
     --cat-food:#9AA3D9;
     --cat-shop:#D1A574;
     --cat-transport:#A6A9BE;
-    --pin-ring: rgba(166,174,221,0.3);
   }
 }
 
 *{ box-sizing:border-box; }
 html,body{ margin:0; }
-body{
-  background:var(--cream);
-  color:var(--ink);
-  font-family:'Karla', ui-sans-serif, system-ui, sans-serif;
-}
-.page{
-  max-width:780px; margin:0 auto;
-  padding:18px 16px 32px;
-}
+body{ background:var(--cream); color:var(--ink); font-family:'Karla', ui-sans-serif, system-ui, sans-serif; }
+.page{ max-width:780px; margin:0 auto; padding:18px 16px 32px; }
 h1,h2{ font-family:'Newsreader', Georgia, 'Times New Roman', serif; font-weight:500; margin:0; }
 .top{ display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
 .eyebrow{ font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); font-weight:700; }
 .top h1{ font-size:clamp(24px,5vw,30px); }
-.top p{ margin:2px 0 0; color:var(--muted); font-size:14px; max-width:56ch; }
+.top p{ margin:2px 0 0; color:var(--muted); font-size:14px; max-width:60ch; }
 
-.filters{ display:flex; gap:8px; overflow-x:auto; padding:10px 0 4px; margin-bottom:12px; }
+.map-wrap{
+  width:100%; aspect-ratio:4/3; border-radius:20px; overflow:hidden;
+  border:1px solid var(--line); box-shadow:var(--card-shadow); background:var(--sand);
+}
+@media (min-width:600px){ .map-wrap{ aspect-ratio:16/9; } }
+.gmap{ width:100%; height:100%; border:0; display:block; }
+
+.map-caption{
+  display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); margin-top:8px;
+}
+.map-caption a{ color:var(--accent); font-weight:600; text-decoration:none; }
+.map-caption a:hover{ text-decoration:underline; }
+
+.picks-heading{ margin-top:26px; font-size:19px; }
+
+.filters{ display:flex; gap:8px; overflow-x:auto; padding:10px 0 4px; margin-bottom:4px; }
 .chip{
   flex:none; border:1px solid var(--line); background:var(--card-bg); color:var(--ink);
   font-size:13px; font-weight:600; padding:7px 14px; border-radius:999px; cursor:pointer;
@@ -62,26 +68,20 @@ h1,h2{ font-family:'Newsreader', Georgia, 'Times New Roman', serif; font-weight:
 .chip[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
 .chip[aria-pressed="true"] .dot{ background:var(--accent-ink); }
 
-.map-wrap{
-  width:100%; aspect-ratio:4/5; border-radius:20px; overflow:hidden;
-  border:1px solid var(--line); box-shadow:var(--card-shadow);
+.picks{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:10px; margin-top:10px; }
+.pick-card{
+  display:flex; align-items:center; gap:10px; text-align:left; background:var(--card-bg); border:1px solid var(--line);
+  border-radius:14px; padding:10px 12px; cursor:pointer;
 }
-@media (min-width:600px){ .map-wrap{ aspect-ratio:16/11; } }
-#map{ width:100%; height:100%; background:var(--sand); }
-
-.map-caption{
-  display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:8px;
-}
-
-.divpin{ background:none; border:none; }
-.divpin .bubble{
-  width:34px; height:34px; border-radius:50% 50% 50% 4px; transform:rotate(45deg);
-  background:var(--cat, var(--accent)); border:2.5px solid var(--card-bg);
-  box-shadow:0 6px 14px -6px rgba(0,0,0,0.45);
+.pick-card[aria-pressed="true"]{ border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
+.pick-icon{
+  flex:none; width:34px; height:34px; border-radius:50%; background:var(--cat,var(--accent)); color:#fff;
   display:flex; align-items:center; justify-content:center;
 }
-.divpin.house .bubble{ width:44px; height:44px; border-width:3px; background:var(--mark); }
-.divpin svg{ transform:rotate(-45deg); width:15px; height:15px; color:#fff; }
+.pick-icon svg{ width:16px; height:16px; }
+.pick-body{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+.pick-name{ font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pick-time{ font-size:12px; color:var(--muted); }
 
 .panel{
   margin-top:14px; background:var(--card-bg); border:1px solid var(--line); border-radius:18px;
@@ -92,8 +92,7 @@ h1,h2{ font-family:'Newsreader', Georgia, 'Times New Roman', serif; font-weight:
   background:linear-gradient(135deg, var(--cat, var(--accent)) 0%, color-mix(in srgb, var(--cat, var(--accent)) 55%, var(--card-bg)) 100%);
   display:flex; align-items:center; justify-content:center; color:#fff;
 }
-.panel .photo img{ width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
-.panel .photo svg{ width:15%; max-width:56px; opacity:0.85; position:relative; }
+.panel .photo svg{ width:15%; max-width:56px; opacity:0.85; }
 .ph-tag{
   position:absolute; bottom:10px; left:12px; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase;
   background:rgba(0,0,0,0.28); color:#fff; padding:3px 8px; border-radius:6px; font-weight:700;
@@ -111,12 +110,14 @@ h1,h2{ font-family:'Newsreader', Georgia, 'Times New Roman', serif; font-weight:
   background:color-mix(in srgb, var(--accent) 14%, var(--card-bg)); padding:4px 10px; border-radius:999px;
 }
 .panel p.desc{ margin:0; font-size:14.5px; line-height:1.55; max-width:60ch; }
+.btn-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
 .cta{
-  margin-top:4px; align-self:flex-start; display:inline-flex; align-items:center; gap:7px;
+  display:inline-flex; align-items:center; gap:7px;
   background:var(--accent); color:var(--accent-ink); text-decoration:none; font-weight:700; font-size:13.5px;
   padding:10px 16px; border-radius:10px;
 }
+.cta.ghost{ background:transparent; color:var(--accent); border:1.5px solid var(--accent); }
 .cta svg{ width:15px; height:15px; }
 
-footer.credit{ margin-top:16px; text-align:center; font-size:11.5px; color:var(--muted); }
+footer.credit{ margin-top:20px; text-align:center; font-size:11.5px; color:var(--muted); }
 footer.credit a{ color:var(--accent); }

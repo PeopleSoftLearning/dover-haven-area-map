@@ -10,18 +10,21 @@
   };
 
   var CATS = [
-    { id: "beach", label: "Beach & boardwalk", varname: "--cat-beach" },
+    { id: "beach", label: "Beach", varname: "--cat-beach" },
     { id: "food", label: "Food & nightlife", varname: "--cat-food" },
-    { id: "shop", label: "Shopping & essentials", varname: "--cat-shop" },
+    { id: "shop", label: "Shopping", varname: "--cat-shop" },
     { id: "transport", label: "Getting around", varname: "--cat-transport" }
   ];
 
   var filtersEl = document.getElementById("filters");
+  var picksEl = document.getElementById("picks");
   var panel = document.getElementById("panel");
+  var gmap = document.getElementById("gmap");
+  var mapLabel = document.getElementById("mapLabel");
+  var fullMapLink = document.getElementById("fullMapLink");
   var activeCat = "all";
   var openId = null;
-  var photoIndex = {};
-  var map, markers = {}, allPois = [], house;
+  var house, picks = [];
 
   function catColorVar(cat) {
     if (cat === "house") return "var(--mark)";
@@ -38,67 +41,94 @@
     }).join("");
   }
 
-  function pinIcon(poi) {
-    var isHouse = poi.category === "house";
-    return L.divIcon({
-      className: "",
-      html: '<div class="divpin ' + (isHouse ? "house" : "") + '"><div class="bubble" style="--cat:' + catColorVar(poi.category) + '">' + ICONS[poi.category] + '</div></div>',
-      iconSize: isHouse ? [44, 44] : [34, 34],
-      iconAnchor: isHouse ? [22, 44] : [17, 34]
-    });
+  function renderPicks() {
+    picksEl.innerHTML = picks.filter(function (p) {
+      return activeCat === "all" || p.category === activeCat;
+    }).map(function (p) {
+      var catInfo = CATS.filter(function (c) { return c.id === p.category; })[0];
+      return '<button class="pick-card" data-id="' + p.id + '" aria-pressed="' + (p.id === openId) + '">' +
+        '<span class="pick-icon" style="--cat:' + catColorVar(p.category) + '">' + ICONS[p.category] + '</span>' +
+        '<span class="pick-body">' +
+          '<span class="pick-name">' + p.name + '</span>' +
+          '<span class="pick-time">' + p.timeLabel + '</span>' +
+        '</span>' +
+      '</button>';
+    }).join("");
   }
 
-  function applyFilter() {
-    Object.keys(markers).forEach(function (id) {
-      var poi = allPois.filter(function (p) { return p.id === id; })[0];
-      var visible = activeCat === "all" || poi.category === activeCat || poi.category === "house";
-      var m = markers[id];
-      if (visible && !map.hasLayer(m)) m.addTo(map);
-      if (!visible && map.hasLayer(m)) map.removeLayer(m);
-    });
+  function streetViewUrl(p) {
+    return "https://www.google.com/maps?layer=c&cbll=" + p.lat + "," + p.lng;
+  }
+  function mapsSearchUrl(p) {
+    return "https://www.google.com/maps?q=" + p.lat + "," + p.lng;
   }
 
   function renderPanel() {
     if (!openId) { panel.innerHTML = ""; panel.style.display = "none"; return; }
     panel.style.display = "";
-    var p = allPois.filter(function (x) { return x.id === openId; })[0];
+    var p = picks.filter(function (x) { return x.id === openId; })[0];
     if (!p) return;
     var catInfo = CATS.filter(function (c) { return c.id === p.category; })[0];
-    var catLabel = p.category === "house" ? "Dover Haven" : (catInfo ? catInfo.label : "");
     panel.innerHTML =
       '<div class="photo" style="--cat:' + catColorVar(p.category) + '">' +
         ICONS[p.category] +
-        '<span class="ph-tag">' + p.photos.length + (p.photos.length === 1 ? " photo" : " photos") + ' · drop files in /assets</span>' +
+        '<span class="ph-tag">Add a photo in /assets</span>' +
       '</div>' +
       '<div class="body">' +
         '<div class="row1">' +
-          '<div><div class="cat-tag" style="--cat:' + catColorVar(p.category) + '">' + catLabel + '</div><h2>' + p.name + '</h2></div>' +
+          '<div><div class="cat-tag" style="--cat:' + catColorVar(p.category) + '">' + (catInfo ? catInfo.label : "") + '</div><h2>' + p.name + '</h2></div>' +
           '<button class="close-btn" aria-label="Close">&times;</button>' +
         '</div>' +
         '<span class="time-badge">' + p.timeLabel + '</span>' +
         '<p class="desc">' + p.description + '</p>' +
-        '<a class="cta" href="' + WHATSAPP + '?text=' + encodeURIComponent("Hi! I had a question about " + p.name + " near Dover Haven.") + '" target="_blank" rel="noopener">' +
-          '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1s-.6.8-.7.9c-.1.1-.3.2-.5.1a6.5 6.5 0 0 1-1.9-1.2 7.1 7.1 0 0 1-1.3-1.6c-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4a.5.5 0 0 0 0-.5c-.1-.1-.5-1.3-.7-1.7-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.9 2 4.7 4.7 0 0 0 1 2.5 10.7 10.7 0 0 0 4.1 3.6c.6.2 1 .4 1.4.5a3.4 3.4 0 0 0 1.5.1 2.5 2.5 0 0 0 1.6-1.1 1.9 1.9 0 0 0 .1-1.1c-.1-.1-.2-.2-.4-.3z"/></svg>' +
-          'Ask about ' + p.name +
-        '</a>' +
+        '<div class="btn-row">' +
+          '<a class="cta" href="' + WHATSAPP + '?text=' + encodeURIComponent("Hi! I had a question about " + p.name + " near Dover Haven.") + '" target="_blank" rel="noopener">' +
+            '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1s-.6.8-.7.9c-.1.1-.3.2-.5.1a6.5 6.5 0 0 1-1.9-1.2 7.1 7.1 0 0 1-1.3-1.6c-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4a.5.5 0 0 0 0-.5c-.1-.1-.5-1.3-.7-1.7-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.9 2 4.7 4.7 0 0 0 1 2.5 10.7 10.7 0 0 0 4.1 3.6c.6.2 1 .4 1.4.5a3.4 3.4 0 0 0 1.5.1 2.5 2.5 0 0 0 1.6-1.1 1.9 1.9 0 0 0 .1-1.1c-.1-.1-.2-.2-.4-.3z"/></svg>' +
+            'Ask about ' + p.name +
+          '</a>' +
+          '<a class="cta ghost" href="' + streetViewUrl(p) + '" target="_blank" rel="noopener">Street View &rarr;</a>' +
+        '</div>' +
       '</div>';
   }
 
-  function openPin(id) {
+  function focusOnMap(p) {
+    gmap.src = "https://www.google.com/maps?q=" + p.lat + "," + p.lng + "&z=17&output=embed";
+    mapLabel.textContent = "Showing: " + p.name;
+    fullMapLink.href = mapsSearchUrl(p);
+  }
+  function focusOnHouse() {
+    gmap.src = "https://www.google.com/maps?q=" + encodeURIComponent(house.address) + "&output=embed";
+    mapLabel.textContent = "Showing: Dover Haven";
+    fullMapLink.href = "https://www.google.com/maps?q=" + encodeURIComponent(house.address);
+  }
+
+  function openPick(id) {
     openId = id;
+    var p = picks.filter(function (x) { return x.id === id; })[0];
+    if (p) focusOnMap(p);
+    renderPicks();
     renderPanel();
-    var m = markers[id];
-    if (m) map.panTo(m.getLatLng());
     panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
-  function closePanel() { openId = null; renderPanel(); }
+  function closePanel() {
+    openId = null;
+    focusOnHouse();
+    renderPicks();
+    renderPanel();
+  }
 
   filtersEl.addEventListener("click", function (e) {
     var btn = e.target.closest(".chip");
     if (!btn) return;
     activeCat = btn.getAttribute("data-cat");
     renderFilters();
-    applyFilter();
+    renderPicks();
+  });
+  picksEl.addEventListener("click", function (e) {
+    var btn = e.target.closest(".pick-card");
+    if (!btn) return;
+    var id = btn.getAttribute("data-id");
+    if (openId === id) closePanel(); else openPick(id);
   });
   panel.addEventListener("click", function (e) {
     if (e.target.closest(".close-btn")) closePanel();
@@ -108,30 +138,12 @@
     .then(function (r) { return r.json(); })
     .then(function (data) {
       house = data.house;
-      allPois = [house].concat(data.pois);
-
-      map = L.map("map", { zoomControl: true, scrollWheelZoom: false }).setView([house.lat, house.lng], 15);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
-
-      allPois.forEach(function (poi) {
-        var marker = L.marker([poi.lat, poi.lng], { icon: pinIcon(poi) });
-        marker.on("click", function () {
-          if (openId === poi.id) closePanel(); else openPin(poi.id);
-        });
-        markers[poi.id] = marker;
-        marker.addTo(map);
-      });
-
+      picks = data.picks;
       renderFilters();
-      applyFilter();
-      openPin("house");
+      renderPicks();
     })
     .catch(function (err) {
-      document.getElementById("map").innerHTML =
-        '<p style="padding:16px;color:var(--muted)">Could not load data/pois.json — if you are opening this file directly (file://), run a local server instead (see README).</p>';
+      picksEl.innerHTML = '<p style="padding:8px;color:var(--muted)">Could not load data/pois.json — if opening this file directly (file://), run a local server instead (see README).</p>';
       console.error(err);
     });
 })();
