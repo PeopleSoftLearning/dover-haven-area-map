@@ -1,12 +1,14 @@
 # Dover Haven — Area Map
 
-An area guide for Dover Haven (Unit 4, Dover Mews): a real, live, drag-and-zoom map — plus a small
-"Host picks" strip of hand-picked favourites, each with a description, a walk/drive time, an "Ask
-about this" WhatsApp button, and a Street View link.
+An area guide for Dover Haven (Unit 4, Dover Mews): a real, live, drag-and-zoom map with **~950
+nearby places** clustered on it (restaurants, shops, banks, beaches, attractions — from OpenStreetMap,
+free and self-updating), filterable by category — plus a small "Host picks" strip of hand-picked
+favourites, each with a description, a walk/drive time, an "Ask about this" WhatsApp button, and a
+Street View link.
 
-The map itself runs on **MapLibre GL + OpenFreeMap** — the same free, no-API-key mapping engine
-Jordan used on his `doverhavenbarbados.space` build — styled in Dover Haven's own colours instead of
-his. No Google Cloud billing, no key to manage, nothing to renew.
+The map runs on **MapLibre GL + OpenFreeMap** — the same free, no-API-key mapping engine Jordan used
+on his `doverhavenbarbados.space` build — styled in Dover Haven's own colours instead of his. No
+Google Cloud billing, no key to manage, nothing to renew.
 
 ## Running it locally
 
@@ -33,25 +35,50 @@ simpler and safer option to start with; embedding is a Lovable change and worth 
 ## Project structure
 
 ```
-index.html        the page — has the Google Map iframe and the picks strip
-styles.css         Dover Haven brand styling
-app.js             picks/filter logic, and re-centers the map when a pick is clicked
-data/pois.json     the house + every "host pick": name, category, coordinates, time, description, photos
-assets/            drop real photos here
+index.html          the page
+styles.css           Dover Haven brand styling
+app.js               map, clustering, filters and picks logic
+data/pois.json       the house + every "host pick": name, category, coordinates, time, description, photos
+data/directory.json  ~950 nearby places from OpenStreetMap (name, category, coordinates) — see below
+assets/              drop real photos here
 ```
 
-## Why MapLibre + OpenFreeMap instead of custom pins for everything
+## Why MapLibre + OpenFreeMap instead of the old Google iframe
 
-Lena's call, deliberately: the map is the zero-maintenance part — it's a real, draggable, zoomable map
-of the area, so guests can look up any restaurant, pharmacy or shop themselves without anyone
-maintaining a list of them. The custom part of this page is a short list of the host's own favourites
-(the "picks" in `data/pois.json`), each with a personal note and a way to ask a question.
+Google's free embed can't be recoloured or have custom pins added — it's the same anywhere it's used.
+OpenFreeMap gives a live map that's styled in Dover Haven's own colours, can show the "Host picks" as
+real photo pins, and can carry the full nearby-places directory below — for the same zero cost and
+zero API key. An "Open in Google Maps →" link stays next to the map for anyone who wants Google's own
+reviews or turn-by-turn directions.
 
-**Why not the Google iframe this page used before:** Google's free embed can't be recoloured or have
-custom pins added — it's the same anywhere it's used. Switching to OpenFreeMap gives a live map that's
-styled in Dover Haven's own colours and can show the "Host picks" as real pins on it (Jordan's approach
-on his own site), for the same zero cost and zero API key. An "Open in Google Maps →" link stays next
-to the map for guests who want Google's own business listings, reviews or turn-by-turn directions.
+## The nearby-places directory (`data/directory.json`)
+
+This is what makes the map "informative" without any manual upkeep: ~950 real places around Dover —
+restaurants, cafés, banks, pharmacies, shops, beaches, attractions — plotted automatically and grouped
+into number bubbles ("clusters") that split apart as you zoom in, exactly like the map on Jordan's
+`doverhavenbarbados.space`.
+
+**Where it's from:** [OpenStreetMap](https://www.openstreetmap.org) — the free, crowd-sourced map
+database that most map apps draw from in some form — licensed under **ODbL 1.0** (Open Database
+Licence). ODbL explicitly allows copying and reusing this kind of factual database data (names,
+categories, coordinates), as long as OpenStreetMap is credited, which this page does in the small
+caption under the map. This is different from the *photos* question below — ODbL covers place
+listings, not pictures.
+
+This specific snapshot (953 places, dated 2026-09-15) was one Jordan had already pulled for his own
+site; reusing the data itself is fine under its licence, the same way his own README documents doing.
+Nothing from his *code*, styling, or unlicensed photos was copied — just this one public dataset.
+
+**Refreshing it later**, once it's a few months old or a place has closed/opened: download a Barbados
+extract from [OpenStreetMap France](https://download.openstreetmap.fr/extracts/central-america/) and
+run `python3 -m pip install osmium` then a small import script (ask for one when it's time — not
+included here to keep this repo simple). Until then, a wrong or closed place is rare and low-stakes —
+guests can always confirm anything through Google/the directions link.
+
+**Clicking a directory pin** shows its name, category and straight-line distance from the house, plus
+a "Directions" link (opens Google Maps). These aren't Host picks — no photo, no description, no
+WhatsApp button — just what's genuinely there nearby. A **Host pick** is the richer treatment,
+reserved for places Lena actually recommends.
 
 ## Adding, editing or removing a "pick"
 
@@ -70,9 +97,10 @@ Open `data/pois.json`. Each entry under `"picks"` looks like this:
 }
 ```
 
-- `category` must be one of: `beach`, `food`, `shop`, `transport`. Add a new one by adding it to the
-  `CATS` array near the top of `app.js` and giving it a colour variable in `styles.css` (copy the
-  `--cat-*` pattern).
+- `category` must be one of: `beach`, `food`, `essentials`, `explore`, `transport` (the same categories
+  the OpenStreetMap directory uses, plus `transport` for host-only picks like the airport). Add a new
+  one by adding it to the `CATS` array near the top of `app.js` and giving it a colour variable in
+  `styles.css` (copy the `--cat-*` pattern).
 - `lat` / `lng` — used for the Street View link and to re-center the map when this pick is clicked.
   Right-click any spot on [Google Maps](https://maps.google.com) and copy the coordinates it shows.
 - `photos` — points at a file in `assets/` that doesn't exist yet, so the card shows a coloured
@@ -115,19 +143,19 @@ here. Worth a separate conversation once the map itself is live and settled.
 ## What was deliberately left out of Jordan's build
 
 Jordan's `barbadosrental` repo (private, shared for reference — nothing in it was copied verbatim or
-committed here) is a much bigger, separate application: React/Vite/Express, a 953-place OpenStreetMap
-business directory with clustering and photo pins, a three-step custom booking flow with its own
-calendar, and a server-side Gemini AI concierge. Left out of this hybrid, on purpose:
+committed here, aside from the one public OpenStreetMap dataset above) is a much bigger, separate
+application: React/Vite/Express, a three-step custom booking flow with its own calendar, and a
+server-side Gemini AI concierge. Left out of this hybrid, on purpose:
 
-- **The 953-place directory overlay.** Genuinely useful, but a lot more surface area to keep working
-  (photo credits, licensing, a refresh script). This page's map already shows everything nearby via the
-  live basemap; his dataset is worth revisiting later only if the "Host picks" list starts to feel too
-  thin.
 - **His custom booking flow.** It's presented as an enquiry, not a live reservation, and by his own
   README it does **not** two-way sync with any channel — exactly the kind of second, disconnected
   booking surface that caused the past double-booking. Lodgify stays the one and only source of truth
   for availability.
 - **The Gemini AI concierge.** Needs its own API key and hosting; a separate project if wanted later.
+- **His own place photos** (Irie Foods, Epic Surf Café's own listing photo, etc.) — his own credits file
+  marks most of these as not openly licensed, so they weren't reused here. See "Photos for Host picks"
+  above: only genuinely openly-licensed or Lena's own photos go in.
 
-What *was* brought over: the mapping approach itself (MapLibre + OpenFreeMap, free, no key), applied to
-this page's own simpler picks-based content model and Dover Haven's branding.
+What *was* brought over: the MapLibre + OpenFreeMap mapping engine and the OpenStreetMap places
+dataset (both free, both properly licensed for reuse), restyled in Dover Haven's own colours and this
+page's simpler Host-picks model on top.

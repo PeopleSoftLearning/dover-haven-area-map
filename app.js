@@ -5,16 +5,28 @@
     house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>',
     beach: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 21c3-2 6-2 9 0s6 2 9 0"/><path d="M12 3v9"/><path d="M8 7l4-4 4 4"/></svg>',
     food: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2v8a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M17 2c-2 2-2 6-2 8s0 2 2 2 2 0 2-2-0-6-2-8z"/><path d="M17 14v8"/></svg>',
-    shop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1.5 11H5.5z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>',
+    essentials: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1.5 11H5.5z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>',
+    explore: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5l-2 5-5 2 2-5z"/></svg>',
     transport: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l19-9-9 19-2-8z"/></svg>'
   };
 
   var CATS = [
-    { id: "beach", label: "Beach", varname: "--cat-beach" },
-    { id: "food", label: "Food & nightlife", varname: "--cat-food" },
-    { id: "shop", label: "Shopping", varname: "--cat-shop" },
-    { id: "transport", label: "Getting around", varname: "--cat-transport" }
+    { id: "beach", label: "Beaches", varname: "--cat-beach", hex: "#3E7691", hexDark: "#6FB0CE" },
+    { id: "food", label: "Food & drink", varname: "--cat-food", hex: "#55619E", hexDark: "#9AA3D9" },
+    { id: "essentials", label: "Essentials", varname: "--cat-essentials", hex: "#9C7245", hexDark: "#D1A574" },
+    { id: "explore", label: "Things to do", varname: "--cat-explore", hex: "#3F8F6C", hexDark: "#7FCBA4" },
+    { id: "transport", label: "Getting around", varname: "--cat-transport", hex: "#6E7180", hexDark: "#A6A9BE" }
   ];
+
+  // Directory categories (OpenStreetMap contributors, via Jordan's Sept 2026 extract,
+  // ODbL 1.0 — public database facts, freely reusable with attribution) map onto the
+  // same categories used for Host picks.
+  var DIR_CAT_MAP = {
+    "Beaches": "beach",
+    "Food & drink": "food",
+    "Essentials": "essentials",
+    "Things to do": "explore"
+  };
 
   var filtersEl = document.getElementById("filters");
   var picksEl = document.getElementById("picks");
@@ -26,10 +38,27 @@
   var house, picks = [];
   var map, markers = {};
   var houseGalleryIndex = 0;
+  var directoryPlaces = [];     // full OpenStreetMap directory (Essentials, Food & drink, Beaches, Things to do)
+  var directoryById = {};
+  var directoryLoaded = false;
 
   // Free vector-tile basemap (no API key, no billing) — OpenStreetMap data
   // served by OpenFreeMap, the same free engine Jordan's site uses.
   var MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
+
+  // Straight-line distance in km from Dover Haven.
+  function distanceFromHouse(lat, lng) {
+    var r = Math.PI / 180,
+      a = Math.sin(((lat - house.lat) * r) / 2) ** 2 +
+        Math.cos(house.lat * r) * Math.cos(lat * r) * Math.sin(((lng - house.lng) * r) / 2) ** 2;
+    return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  function distanceLabel(km) {
+    return km < 1 ? Math.round(km * 1000) + " m away" : km.toFixed(1) + " km away";
+  }
+  function directionsUrl(lat, lng) {
+    return "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lng;
+  }
 
   function markerEl(cat, isHouse) {
     var el = document.createElement("div");
@@ -38,9 +67,114 @@
     if (isHouse && house.photos && house.photos[0]) {
       el.innerHTML = '<img src="' + house.photos[0] + '" alt="" />';
     } else {
-      el.innerHTML = ICONS[cat] || ICONS.shop;
+      el.innerHTML = ICONS[cat] || ICONS.essentials;
     }
     return el;
+  }
+
+  function directoryGeoJSON(places) {
+    return {
+      type: "FeatureCollection",
+      features: places.map(function (p) {
+        return {
+          type: "Feature",
+          id: p.id,
+          geometry: { type: "Point", coordinates: [p.lng, p.lat] },
+          properties: { id: p.id, name: p.name, category: DIR_CAT_MAP[p.category] || "explore" }
+        };
+      })
+    };
+  }
+
+  function addDirectoryLayer() {
+    map.addSource("directory", {
+      type: "geojson",
+      data: directoryGeoJSON(directoryPlaces),
+      cluster: true,
+      clusterMaxZoom: 16,
+      clusterRadius: 56
+    });
+
+    map.addLayer({
+      id: "dir-clusters",
+      type: "circle",
+      source: "directory",
+      filter: ["has", "point_count"],
+      paint: {
+        "circle-color": "#3A362E",
+        "circle-opacity": 0.88,
+        "circle-radius": ["step", ["get", "point_count"], 14, 10, 17, 30, 20, 100, 24]
+      }
+    });
+    map.addLayer({
+      id: "dir-cluster-count",
+      type: "symbol",
+      source: "directory",
+      filter: ["has", "point_count"],
+      layout: {
+        "text-field": "{point_count_abbreviated}",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 12
+      },
+      paint: { "text-color": "#FBF7EF" }
+    });
+
+    var catColorExpr = ["match", ["get", "category"]];
+    CATS.forEach(function (c) { catColorExpr.push(c.id, c.hex); });
+    catColorExpr.push("#8A806E");
+
+    map.addLayer({
+      id: "dir-points",
+      type: "circle",
+      source: "directory",
+      filter: ["!", ["has", "point_count"]],
+      paint: {
+        "circle-color": catColorExpr,
+        "circle-radius": 6,
+        "circle-stroke-width": 1.5,
+        "circle-stroke-color": "#ffffff"
+      }
+    });
+
+    map.on("click", "dir-clusters", function (e) {
+      var features = map.queryRenderedFeatures(e.point, { layers: ["dir-clusters"] });
+      var clusterId = features[0].properties.cluster_id;
+      map.getSource("directory").getClusterExpansionZoom(clusterId).then(function (zoom) {
+        map.easeTo({ center: features[0].geometry.coordinates, zoom: zoom });
+      }).catch(function () {});
+    });
+    map.on("click", "dir-points", function (e) {
+      var f = e.features[0];
+      var place = directoryById[f.properties.id];
+      if (!place) return;
+      var km = distanceFromHouse(place.lat, place.lng);
+      var html =
+        '<div class="dir-popup">' +
+          '<div class="dir-popup-cat">' + (CATS.filter(function (c) { return c.id === f.properties.category; })[0] || {}).label + '</div>' +
+          '<h3>' + place.name + '</h3>' +
+          '<p>' + distanceLabel(km) + '</p>' +
+          '<a class="cta ghost sm" href="' + directionsUrl(place.lat, place.lng) + '" target="_blank" rel="noopener">Directions &rarr;</a>' +
+        '</div>';
+      new maplibregl.Popup({ closeButton: true, maxWidth: "220px" })
+        .setLngLat(f.geometry.coordinates)
+        .setHTML(html)
+        .addTo(map);
+    });
+    ["dir-clusters", "dir-points"].forEach(function (layerId) {
+      map.on("mouseenter", layerId, function () { map.getCanvas().style.cursor = "pointer"; });
+      map.on("mouseleave", layerId, function () { map.getCanvas().style.cursor = ""; });
+    });
+
+    directoryLoaded = true;
+    applyDirectoryFilter();
+  }
+
+  function applyDirectoryFilter() {
+    if (!directoryLoaded) return;
+    var places = activeCat === "all"
+      ? directoryPlaces
+      : directoryPlaces.filter(function (p) { return (DIR_CAT_MAP[p.category] || "explore") === activeCat; });
+    map.getSource("directory").setData(directoryGeoJSON(places));
   }
 
   function initMap() {
@@ -71,6 +205,9 @@
         .setLngLat([p.lng, p.lat])
         .addTo(map);
     });
+
+    if (map.isStyleLoaded()) addDirectoryLayer();
+    else map.once("load", addDirectoryLayer);
   }
 
   function setMarkerVisibility() {
@@ -79,6 +216,7 @@
       var el = markers[p.id] && markers[p.id].getElement();
       if (el) el.style.display = show ? "" : "none";
     });
+    applyDirectoryFilter();
   }
 
   function catColorVar(cat) {
@@ -100,9 +238,11 @@
     picksEl.innerHTML = picks.filter(function (p) {
       return activeCat === "all" || p.category === activeCat;
     }).map(function (p) {
-      var catInfo = CATS.filter(function (c) { return c.id === p.category; })[0];
+      var thumb = (p.photos && p.photos[0])
+        ? '<img src="' + p.photos[0] + '" alt="" />'
+        : (ICONS[p.category] || ICONS.essentials);
       return '<button class="pick-card" data-id="' + p.id + '" aria-pressed="' + (p.id === openId) + '">' +
-        '<span class="pick-icon" style="--cat:' + catColorVar(p.category) + '">' + ICONS[p.category] + '</span>' +
+        '<span class="pick-thumb" style="--cat:' + catColorVar(p.category) + '">' + thumb + '</span>' +
         '<span class="pick-body">' +
           '<span class="pick-name">' + p.name + '</span>' +
           '<span class="pick-time">' + p.timeLabel + '</span>' +
@@ -242,14 +382,27 @@
     if (e.target.closest(".close-btn")) closePanel();
   });
 
-  fetch("data/pois.json")
-    .then(function (r) { return r.json(); })
-    .then(function (data) {
+  Promise.all([
+    fetch("data/pois.json").then(function (r) { return r.json(); }),
+    fetch("data/directory.json").then(function (r) { return r.json(); }).catch(function () { return { places: [] }; })
+  ])
+    .then(function (results) {
+      var data = results[0];
+      var dir = results[1];
       house = data.house;
       picks = data.picks;
+      directoryPlaces = dir.places || [];
+      directoryById = {};
+      directoryPlaces.forEach(function (p) { directoryById[p.id] = p; });
       renderFilters();
       renderPicks();
-      initMap();
+      try {
+        initMap();
+      } catch (mapErr) {
+        console.error("Map failed to load:", mapErr);
+        document.getElementById("map").innerHTML =
+          '<p style="padding:16px;color:var(--muted);font-size:13px">The interactive map couldn\'t load (check your connection) — use "Open in Google Maps" above, or the Host picks below still work.</p>';
+      }
     })
     .catch(function (err) {
       picksEl.innerHTML = '<p style="padding:8px;color:var(--muted)">Could not load data/pois.json — if opening this file directly (file://), run a local server instead (see README).</p>';

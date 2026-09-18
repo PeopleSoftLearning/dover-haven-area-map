@@ -30,7 +30,7 @@
     {
       "id": "dover-market",
       "name": "The Dover Market",
-      "category": "shop",
+      "category": "essentials",
       "lat": 13.065813,
       "lng": -59.565563,
       "timeLabel": "3 min walk · 220 m",
@@ -38,6 +38,26 @@
       "photos": [
         "assets/dover-market.jpg"
       ]
+    },
+    {
+      "id": "rbc-atm",
+      "name": "RBC Royal Bank & ATM",
+      "category": "essentials",
+      "lat": 13.066151,
+      "lng": -59.566359,
+      "timeLabel": "2 min walk · 190 m",
+      "description": "The nearest bank branch and ATM, right by Mystique — handy for cash before the beach vendors or a taxi.",
+      "photos": []
+    },
+    {
+      "id": "epic-surf-cafe",
+      "name": "Epic Surf Café",
+      "category": "food",
+      "lat": 13.067077,
+      "lng": -59.554711,
+      "timeLabel": "~15 min walk along the coast",
+      "description": "Part of the surf school down the beach — amazing açaí bowls and coffee. The surf school itself runs year-round; the café side is seasonal, tourist-season only.",
+      "photos": []
     },
     {
       "id": "gap",
@@ -68,7 +88,7 @@
       "name": "Grantley Adams Airport",
       "category": "transport",
       "lat": 13.07472,
-      "lng": -59.49250,
+      "lng": -59.4925,
       "timeLabel": "~15 min",
       "description": "A transfer can be arranged in advance — just ask when you book.",
       "photos": [
