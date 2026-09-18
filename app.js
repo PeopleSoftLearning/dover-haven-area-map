@@ -19,12 +19,59 @@
   var filtersEl = document.getElementById("filters");
   var picksEl = document.getElementById("picks");
   var panel = document.getElementById("panel");
-  var gmap = document.getElementById("gmap");
   var mapLabel = document.getElementById("mapLabel");
   var fullMapLink = document.getElementById("fullMapLink");
   var activeCat = "all";
   var openId = null;
   var house, picks = [];
+  var map, markers = {};
+
+  // Free vector-tile basemap (no API key, no billing) — OpenStreetMap data
+  // served by OpenFreeMap, the same free engine Jordan's site uses.
+  var MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
+
+  function markerEl(cat, isHouse) {
+    var el = document.createElement("div");
+    el.className = "map-pin" + (isHouse ? " map-pin--house" : "");
+    el.style.setProperty("--cat", catColorVar(cat));
+    el.innerHTML = ICONS[cat] || ICONS.shop;
+    return el;
+  }
+
+  function initMap() {
+    map = new maplibregl.Map({
+      container: "map",
+      style: MAP_STYLE,
+      center: [house.lng, house.lat],
+      zoom: 15,
+      attributionControl: false
+    });
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+
+    var houseEl = markerEl("house", true);
+    houseEl.addEventListener("click", function () { closePanel(); });
+    markers.house = new maplibregl.Marker({ element: houseEl })
+      .setLngLat([house.lng, house.lat])
+      .addTo(map);
+
+    picks.forEach(function (p) {
+      var el = markerEl(p.category, false);
+      el.addEventListener("click", function () {
+        if (openId === p.id) closePanel(); else openPick(p.id);
+      });
+      markers[p.id] = new maplibregl.Marker({ element: el })
+        .setLngLat([p.lng, p.lat])
+        .addTo(map);
+    });
+  }
+
+  function setMarkerVisibility() {
+    picks.forEach(function (p) {
+      var show = activeCat === "all" || p.category === activeCat;
+      var el = markers[p.id] && markers[p.id].getElement();
+      if (el) el.style.display = show ? "" : "none";
+    });
+  }
 
   function catColorVar(cat) {
     if (cat === "house") return "var(--mark)";
@@ -92,14 +139,21 @@
   }
 
   function focusOnMap(p) {
-    gmap.src = "https://www.google.com/maps?q=" + p.lat + "," + p.lng + "&z=17&output=embed";
+    if (map) map.flyTo({ center: [p.lng, p.lat], zoom: 17, essential: true });
     mapLabel.textContent = "Showing: " + p.name;
     fullMapLink.href = mapsSearchUrl(p);
   }
   function focusOnHouse() {
-    gmap.src = "https://www.google.com/maps?q=" + encodeURIComponent(house.address) + "&output=embed";
+    if (map) map.flyTo({ center: [house.lng, house.lat], zoom: 15, essential: true });
     mapLabel.textContent = "Showing: Dover Haven";
     fullMapLink.href = "https://www.google.com/maps?q=" + encodeURIComponent(house.address);
+  }
+
+  function markActiveMarker() {
+    Object.keys(markers).forEach(function (id) {
+      var el = markers[id].getElement();
+      if (el) el.classList.toggle("map-pin--active", id === openId);
+    });
   }
 
   function openPick(id) {
@@ -108,6 +162,7 @@
     if (p) focusOnMap(p);
     renderPicks();
     renderPanel();
+    markActiveMarker();
     panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
   function closePanel() {
@@ -115,6 +170,7 @@
     focusOnHouse();
     renderPicks();
     renderPanel();
+    markActiveMarker();
   }
 
   filtersEl.addEventListener("click", function (e) {
@@ -123,6 +179,7 @@
     activeCat = btn.getAttribute("data-cat");
     renderFilters();
     renderPicks();
+    setMarkerVisibility();
   });
   picksEl.addEventListener("click", function (e) {
     var btn = e.target.closest(".pick-card");
@@ -141,6 +198,7 @@
       picks = data.picks;
       renderFilters();
       renderPicks();
+      initMap();
     })
     .catch(function (err) {
       picksEl.innerHTML = '<p style="padding:8px;color:var(--muted)">Could not load data/pois.json — if opening this file directly (file://), run a local server instead (see README).</p>';

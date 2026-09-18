@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4/dist/maplibre-gl.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -18,13 +19,13 @@
     </header>
 
     <div class="map-wrap">
-      <iframe id="gmap" class="gmap" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-        src="https://www.google.com/maps?q=2nd+Avenue,+Dover,+Christ+Church,+Barbados&output=embed"></iframe>
+      <div id="map" class="gmap" role="img" aria-label="Map of the area around Dover Haven"></div>
     </div>
     <div class="map-caption">
       <span id="mapLabel">Showing: Dover Haven</span>
       <a id="fullMapLink" href="https://www.google.com/maps?q=2nd+Avenue,+Dover,+Christ+Church,+Barbados" target="_blank" rel="noopener">Open in Google Maps &rarr;</a>
     </div>
+    <p class="map-attrib">Map data &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors, tiles by <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a></p>
 
     <h2 class="picks-heading">Host picks</h2>
     <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
@@ -38,6 +39,7 @@
     </footer>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4/dist/maplibre-gl.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

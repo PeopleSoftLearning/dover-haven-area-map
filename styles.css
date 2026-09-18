@@ -55,6 +55,19 @@ h1,h2{ font-family:'Newsreader', Georgia, 'Times New Roman', serif; font-weight:
 }
 .map-caption a{ color:var(--accent); font-weight:600; text-decoration:none; }
 .map-caption a:hover{ text-decoration:underline; }
+.map-attrib{ margin:2px 0 0; font-size:10.5px; color:var(--muted); }
+.map-attrib a{ color:var(--muted); }
+
+.map-pin{
+  width:34px; height:34px; border-radius:50% 50% 50% 0; transform:rotate(-45deg);
+  background:var(--cat,var(--accent)); border:2px solid var(--card-bg); box-shadow:var(--card-shadow);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.map-pin svg{ width:16px; height:16px; transform:rotate(45deg); stroke:#fff; }
+.map-pin--house{ width:40px; height:40px; }
+.map-pin--house svg{ width:19px; height:19px; }
+.map-pin--active{ box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent), var(--card-shadow); z-index:5; }
+.maplibregl-ctrl-attrib{ display:none; }
 
 .picks-heading{ margin-top:26px; font-size:19px; }
 

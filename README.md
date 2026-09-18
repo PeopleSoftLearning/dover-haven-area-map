@@ -1,9 +1,12 @@
 # Dover Haven — Area Map
 
-An area guide for Dover Haven (Unit 4, Dover Mews): a real, live, embedded Google Map guests can drag
-and zoom themselves — every restaurant, pharmacy and shop Google knows about shows up on its own, no
-maintenance needed — plus a small "Host picks" strip of hand-picked favourites, each with a
-description, a walk/drive time, a "Ask about this" WhatsApp button, and a Street View link.
+An area guide for Dover Haven (Unit 4, Dover Mews): a real, live, drag-and-zoom map — plus a small
+"Host picks" strip of hand-picked favourites, each with a description, a walk/drive time, an "Ask
+about this" WhatsApp button, and a Street View link.
+
+The map itself runs on **MapLibre GL + OpenFreeMap** — the same free, no-API-key mapping engine
+Jordan used on his `doverhavenbarbados.space` build — styled in Dover Haven's own colours instead of
+his. No Google Cloud billing, no key to manage, nothing to renew.
 
 ## Running it locally
 
@@ -37,12 +40,18 @@ data/pois.json     the house + every "host pick": name, category, coordinates, t
 assets/            drop real photos here
 ```
 
-## Why an embedded Google Map instead of custom pins for everything
+## Why MapLibre + OpenFreeMap instead of custom pins for everything
 
-Lena's call, deliberately: a live Google Map already has every restaurant, pharmacy, shop and hotel
-nearby, kept up to date by Google — zero upkeep. The custom part of this page is now just a short list
-of the host's own favourites (the "picks" in `data/pois.json`), each with a personal note and a way to
-ask a question. Less to maintain, and guests still get the full real map to explore on their own.
+Lena's call, deliberately: the map is the zero-maintenance part — it's a real, draggable, zoomable map
+of the area, so guests can look up any restaurant, pharmacy or shop themselves without anyone
+maintaining a list of them. The custom part of this page is a short list of the host's own favourites
+(the "picks" in `data/pois.json`), each with a personal note and a way to ask a question.
+
+**Why not the Google iframe this page used before:** Google's free embed can't be recoloured or have
+custom pins added — it's the same anywhere it's used. Switching to OpenFreeMap gives a live map that's
+styled in Dover Haven's own colours and can show the "Host picks" as real pins on it (Jordan's approach
+on his own site), for the same zero cost and zero API key. An "Open in Google Maps →" link stays next
+to the map for guests who want Google's own business listings, reviews or turn-by-turn directions.
 
 ## Adding, editing or removing a "pick"
 
@@ -102,3 +111,23 @@ same number as the "WhatsApp Alison" link on the main site's footer. Change the 
 Jordan's idea of an LLM that answers guest questions about the property and area directly is a
 separate, larger piece of work (needs a backend to hold an API key and answer safely) — not included
 here. Worth a separate conversation once the map itself is live and settled.
+
+## What was deliberately left out of Jordan's build
+
+Jordan's `barbadosrental` repo (private, shared for reference — nothing in it was copied verbatim or
+committed here) is a much bigger, separate application: React/Vite/Express, a 953-place OpenStreetMap
+business directory with clustering and photo pins, a three-step custom booking flow with its own
+calendar, and a server-side Gemini AI concierge. Left out of this hybrid, on purpose:
+
+- **The 953-place directory overlay.** Genuinely useful, but a lot more surface area to keep working
+  (photo credits, licensing, a refresh script). This page's map already shows everything nearby via the
+  live basemap; his dataset is worth revisiting later only if the "Host picks" list starts to feel too
+  thin.
+- **His custom booking flow.** It's presented as an enquiry, not a live reservation, and by his own
+  README it does **not** two-way sync with any channel — exactly the kind of second, disconnected
+  booking surface that caused the past double-booking. Lodgify stays the one and only source of truth
+  for availability.
+- **The Gemini AI concierge.** Needs its own API key and hosting; a separate project if wanted later.
+
+What *was* brought over: the mapping approach itself (MapLibre + OpenFreeMap, free, no key), applied to
+this page's own simpler picks-based content model and Dover Haven's branding.
