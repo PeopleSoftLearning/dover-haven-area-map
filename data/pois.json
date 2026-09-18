@@ -56,8 +56,11 @@
       "lat": 13.067077,
       "lng": -59.554711,
       "timeLabel": "~15 min walk along the coast",
-      "description": "Part of the surf school down the beach — amazing açaí bowls and coffee. The surf school itself runs year-round; the café side is seasonal, tourist-season only.",
-      "photos": []
+      "description": "Part of Barry's Surf School down the beach — amazing açaí bowls and coffee. The surf school itself runs year-round; the café side is seasonal, tourist-season only.",
+      "photos": [
+        "assets/epic-surf-cafe.jpg",
+        "assets/epic-surf-cafe-barrys.jpg"
+      ]
     },
     {
       "id": "gap",
@@ -66,9 +69,22 @@
       "lat": 13.0661,
       "lng": -59.56564,
       "timeLabel": "Short walk along Dover Road",
-      "description": "Restaurants, rum shops and live music — somewhere to eat at almost any hour. Lively in the evening, quiet again by the time you're back in bed.",
+      "description": "The strip of restaurants, rum shops and live music south of the house — Primo Bar & Bistro, Cocktail Kitchen and Mimosas Trattoria among them. Lively in the evening, quiet again by the time you're back in bed.",
       "photos": [
-        "assets/st-lawrence-gap.jpg"
+        "assets/st-lawrence-gap.jpg",
+        "assets/st-lawrence-gap-street.jpg"
+      ]
+    },
+    {
+      "id": "mimosas",
+      "name": "Mimosas Trattoria & Bar",
+      "category": "food",
+      "lat": 13.067452,
+      "lng": -59.572456,
+      "timeLabel": "In St Lawrence Gap",
+      "description": "Italian trattoria right on the water in the Gap — good for a proper sit-down dinner rather than a quick bite.",
+      "photos": [
+        "assets/mimosas.jpg"
       ]
     },
     {

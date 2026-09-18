@@ -30,6 +30,7 @@
 
   var filtersEl = document.getElementById("filters");
   var picksEl = document.getElementById("picks");
+  var nearbyEl = document.getElementById("nearby");
   var panel = document.getElementById("panel");
   var mapLabel = document.getElementById("mapLabel");
   var fullMapLink = document.getElementById("fullMapLink");
@@ -37,7 +38,7 @@
   var openId = null;
   var house, picks = [];
   var map, markers = {};
-  var houseGalleryIndex = 0;
+  var galleryIndex = 0;
   var directoryPlaces = [];     // full OpenStreetMap directory (Essentials, Food & drink, Beaches, Things to do)
   var directoryById = {};
   var directoryLoaded = false;
@@ -147,18 +148,7 @@
       var f = e.features[0];
       var place = directoryById[f.properties.id];
       if (!place) return;
-      var km = distanceFromHouse(place.lat, place.lng);
-      var html =
-        '<div class="dir-popup">' +
-          '<div class="dir-popup-cat">' + (CATS.filter(function (c) { return c.id === f.properties.category; })[0] || {}).label + '</div>' +
-          '<h3>' + place.name + '</h3>' +
-          '<p>' + distanceLabel(km) + '</p>' +
-          '<a class="cta ghost sm" href="' + directionsUrl(place.lat, place.lng) + '" target="_blank" rel="noopener">Directions &rarr;</a>' +
-        '</div>';
-      new maplibregl.Popup({ closeButton: true, maxWidth: "220px" })
-        .setLngLat(f.geometry.coordinates)
-        .setHTML(html)
-        .addTo(map);
+      showDirectoryPopup(place, f.properties.category);
     });
     ["dir-clusters", "dir-points"].forEach(function (layerId) {
       map.on("mouseenter", layerId, function () { map.getCanvas().style.cursor = "pointer"; });
@@ -242,13 +232,60 @@
         ? '<img src="' + p.photos[0] + '" alt="" />'
         : (ICONS[p.category] || ICONS.essentials);
       return '<button class="pick-card" data-id="' + p.id + '" aria-pressed="' + (p.id === openId) + '">' +
-        '<span class="pick-thumb" style="--cat:' + catColorVar(p.category) + '">' + thumb + '</span>' +
+        '<span class="pick-icon" style="--cat:' + catColorVar(p.category) + '">' + thumb + '</span>' +
         '<span class="pick-body">' +
           '<span class="pick-name">' + p.name + '</span>' +
           '<span class="pick-time">' + p.timeLabel + '</span>' +
         '</span>' +
       '</button>';
     }).join("");
+  }
+
+  // "Nearby places" — swipeable strip pulled from the full OpenStreetMap directory
+  // (not Host picks), nearest first, matching Jordan's footer layout.
+  var NEARBY_LIMIT = 40;
+  function renderNearby() {
+    if (!nearbyEl) return;
+    var withDist = directoryPlaces.map(function (p) {
+      return { p: p, km: distanceFromHouse(p.lat, p.lng), cat: DIR_CAT_MAP[p.category] || "explore" };
+    }).filter(function (x) {
+      return activeCat === "all" || x.cat === activeCat;
+    }).sort(function (a, b) { return a.km - b.km; }).slice(0, NEARBY_LIMIT);
+
+    nearbyEl.innerHTML = withDist.map(function (x) {
+      return '<button class="nearby-card" data-id="' + x.p.id + '">' +
+        '<span class="nearby-thumb" style="--cat:' + catColorVar(x.cat) + '">' + (ICONS[x.cat] || ICONS.essentials) + '</span>' +
+        '<span class="nearby-body">' +
+          '<span class="nearby-name">' + x.p.name + '</span>' +
+          '<span class="nearby-dist">' + distanceLabel(x.km) + '</span>' +
+        '</span>' +
+      '</button>';
+    }).join("");
+  }
+
+  function showDirectoryPopup(place, catId) {
+    var km = distanceFromHouse(place.lat, place.lng);
+    var catInfo = CATS.filter(function (c) { return c.id === catId; })[0];
+    var html =
+      '<div class="dir-popup">' +
+        '<div class="dir-popup-cat">' + (catInfo ? catInfo.label : "") + '</div>' +
+        '<h3>' + place.name + '</h3>' +
+        '<p>' + distanceLabel(km) + '</p>' +
+        '<a class="cta ghost sm" href="' + directionsUrl(place.lat, place.lng) + '" target="_blank" rel="noopener">Directions &rarr;</a>' +
+      '</div>';
+    new maplibregl.Popup({ closeButton: true, maxWidth: "220px" })
+      .setLngLat([place.lng, place.lat])
+      .setHTML(html)
+      .addTo(map);
+  }
+
+  function openDirectoryPlace(id) {
+    var place = directoryById[id];
+    if (!place || !map) return;
+    map.flyTo({ center: [place.lng, place.lat], zoom: 17, essential: true });
+    mapLabel.textContent = "Showing: " + place.name;
+    fullMapLink.href = mapsSearchUrl(place);
+    showDirectoryPopup(place, DIR_CAT_MAP[place.category] || "explore");
   }
 
   function streetViewUrl(p) {
@@ -263,19 +300,25 @@
   }
   var WHATSAPP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1s-.6.8-.7.9c-.1.1-.3.2-.5.1a6.5 6.5 0 0 1-1.9-1.2 7.1 7.1 0 0 1-1.3-1.6c-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4a.5.5 0 0 0 0-.5c-.1-.1-.5-1.3-.7-1.7-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.9 2 4.7 4.7 0 0 0 1 2.5 10.7 10.7 0 0 0 4.1 3.6c.6.2 1 .4 1.4.5a3.4 3.4 0 0 0 1.5.1 2.5 2.5 0 0 0 1.6-1.1 1.9 1.9 0 0 0 .1-1.1c-.1-.1-.2-.2-.4-.3z"/></svg>';
 
-  function renderHousePanel() {
-    var photos = house.photos || [];
-    var i = photos.length ? (((houseGalleryIndex % photos.length) + photos.length) % photos.length) : 0;
+  // Builds the photo/gallery block reused by both the house panel and a pick's panel:
+  // real swipeable photos when any exist, otherwise the old icon placeholder.
+  function galleryHtml(photos, catStyle, iconHtml) {
+    photos = photos || [];
+    if (!photos.length) {
+      return '<div class="photo" style="' + catStyle + '">' + iconHtml + '<span class="ph-tag">Add a photo in /assets</span></div>';
+    }
+    var i = ((galleryIndex % photos.length) + photos.length) % photos.length;
     var navBtns = photos.length > 1
       ? '<button class="gal-nav gal-prev" aria-label="Previous photo">&larr;</button>' +
         '<button class="gal-nav gal-next" aria-label="Next photo">&rarr;</button>' +
         '<span class="gal-count">' + (i + 1) + ' / ' + photos.length + '</span>'
       : "";
+    return '<div class="photo photo--house" style="' + catStyle + '"><img src="' + photos[i] + '" alt="" />' + navBtns + '</div>';
+  }
+
+  function renderHousePanel() {
     panel.innerHTML =
-      '<div class="photo photo--house" style="--cat:var(--mark)">' +
-        (photos[i] ? '<img src="' + photos[i] + '" alt="' + house.name + '" />' : ICONS.house) +
-        navBtns +
-      '</div>' +
+      galleryHtml(house.photos, "--cat:var(--mark)", ICONS.house) +
       '<div class="body">' +
         '<div class="row1">' +
           '<div><div class="cat-tag" style="--cat:var(--mark)">Your stay</div><h2>' + house.name + '</h2></div>' +
@@ -299,10 +342,7 @@
     if (!p) return;
     var catInfo = CATS.filter(function (c) { return c.id === p.category; })[0];
     panel.innerHTML =
-      '<div class="photo" style="--cat:' + catColorVar(p.category) + '">' +
-        ICONS[p.category] +
-        '<span class="ph-tag">Add a photo in /assets</span>' +
-      '</div>' +
+      galleryHtml(p.photos, "--cat:" + catColorVar(p.category), ICONS[p.category] || ICONS.essentials) +
       '<div class="body">' +
         '<div class="row1">' +
           '<div><div class="cat-tag" style="--cat:' + catColorVar(p.category) + '">' + (catInfo ? catInfo.label : "") + '</div><h2>' + p.name + '</h2></div>' +
@@ -339,8 +379,8 @@
 
   function openPick(id) {
     openId = id;
+    galleryIndex = 0;
     if (id === "house") {
-      houseGalleryIndex = 0;
       focusOnHouse();
     } else {
       var p = picks.filter(function (x) { return x.id === id; })[0];
@@ -360,8 +400,8 @@
   }
 
   panel.addEventListener("click", function (e) {
-    if (e.target.closest(".gal-prev")) { houseGalleryIndex--; renderHousePanel(); }
-    if (e.target.closest(".gal-next")) { houseGalleryIndex++; renderHousePanel(); }
+    if (e.target.closest(".gal-prev")) { galleryIndex--; renderPanel(); }
+    if (e.target.closest(".gal-next")) { galleryIndex++; renderPanel(); }
   });
 
   filtersEl.addEventListener("click", function (e) {
@@ -370,6 +410,7 @@
     activeCat = btn.getAttribute("data-cat");
     renderFilters();
     renderPicks();
+    renderNearby();
     setMarkerVisibility();
   });
   picksEl.addEventListener("click", function (e) {
@@ -378,6 +419,13 @@
     var id = btn.getAttribute("data-id");
     if (openId === id) closePanel(); else openPick(id);
   });
+  if (nearbyEl) {
+    nearbyEl.addEventListener("click", function (e) {
+      var btn = e.target.closest(".nearby-card");
+      if (!btn) return;
+      openDirectoryPlace(btn.getAttribute("data-id"));
+    });
+  }
   panel.addEventListener("click", function (e) {
     if (e.target.closest(".close-btn")) closePanel();
   });
@@ -396,6 +444,7 @@
       directoryPlaces.forEach(function (p) { directoryById[p.id] = p; });
       renderFilters();
       renderPicks();
+      renderNearby();
       try {
         initMap();
       } catch (mapErr) {

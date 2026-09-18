@@ -69,6 +69,13 @@ This specific snapshot (953 places, dated 2026-09-15) was one Jordan had already
 site; reusing the data itself is fine under its licence, the same way his own README documents doing.
 Nothing from his *code*, styling, or unlicensed photos was copied — just this one public dataset.
 
+**On accuracy:** OpenStreetMap is crowd-sourced — generally solid, but not guaranteed current (a place
+can close, move or never have existed as mapped). Spot-checked on 18 Sep 2026 after Lena flagged one
+she didn't recognise — "Steak House Grill & St. Lawrence Pizza Hut" — which turned out to be a real,
+currently-operating restaurant (confirmed via the official Barbados tourism site and Tripadvisor), just
+one she hadn't personally noticed. If anything in the directory looks wrong, flag it and it can be
+checked the same way, or removed from `data/directory.json` by id.
+
 **Refreshing it later**, once it's a few months old or a place has closed/opened: download a Barbados
 extract from [OpenStreetMap France](https://download.openstreetmap.fr/extracts/central-america/) and
 run `python3 -m pip install osmium` then a small import script (ask for one when it's time — not
@@ -103,8 +110,23 @@ Open `data/pois.json`. Each entry under `"picks"` looks like this:
   `styles.css` (copy the `--cat-*` pattern).
 - `lat` / `lng` — used for the Street View link and to re-center the map when this pick is clicked.
   Right-click any spot on [Google Maps](https://maps.google.com) and copy the coordinates it shows.
-- `photos` — points at a file in `assets/` that doesn't exist yet, so the card shows a coloured
-  placeholder. Add the real image with that exact filename and it'll show up — no code change needed.
+- `photos` — one or more files in `assets/`. If any exist, the pick's card and detail panel show a
+  real swipeable photo gallery; if the array is empty or the file's missing, a coloured icon placeholder
+  shows instead. No code change needed either way — just add or remove files.
+
+### Photo sourcing — a caution
+
+A photo of a place is normally still someone's copyrighted work even when it shows up in a plain
+Google Images search or is easy to save from someone else's listing — being publicly visible isn't the
+same as being licensed for reuse. The lowest-risk photos are: **Lena's own** (taken by her or from her
+listing), a business's **own official photo** (their own website/Google listing — using it to represent
+them is normal and generally welcome), or something explicitly marked **openly licensed** (e.g.
+Wikimedia Commons, CC/public domain). Riskier: another host's or another site's professional photo of
+a public place (a beach, a street) — that's someone's paid photography, not a snapshot of a public
+thing. On 18 Sep, the Dover Beach photo added here was a photo from a *different* Airbnb listing
+(Sapphire Beach Condos) rather than Lena's own — flagged to her as the one worth a second look; kept in
+for now since it's a low-stakes, non-commercial use, but worth swapping for her own beach photo or a
+Commons-licensed one if this site's profile ever grows.
 
 **On coordinate accuracy:** The Dover Market's coordinates are exact, decoded from a Google Plus Code
 Lena confirmed. The house's coordinates are derived from that confirmed point plus Lena's own measured
@@ -115,6 +137,10 @@ same position *relative to* the corrected house — their absolute coordinates a
 though their distance/time labels are all confirmed from Lena's listing copy. Good enough for the
 Street View links and map re-centering this page uses them for; worth tightening later if it matters
 more (e.g. a proper embedded Street View feature).
+
+**Mimosas Trattoria & Bar** (added 18 Sep): coordinates came from a Google Maps link embedded in its
+Tripadvisor page, which itself may just be area-level ("St Lawrence Gap") rather than pinned to the
+exact building — treat as approximate until confirmed, same caveat as the other re-anchored picks above.
 
 **Removed, unconfirmed:** an earlier draft of this data included a "South Coast Boardwalk" pick,
 pulled from old listing-copy notes. Lena wasn't sure it's something to send guests to from here, so

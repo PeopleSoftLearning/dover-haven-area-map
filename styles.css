@@ -102,28 +102,40 @@ h1,h2{ font-family:'Newsreader', Georgia, 'Times New Roman', serif; font-weight:
 .chip[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
 .chip[aria-pressed="true"] .dot{ background:var(--accent-ink); }
 
-.picks{
-  display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x proximity; margin-top:10px; padding:2px 2px 8px;
-}
+.picks{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:10px; margin-top:10px; }
 .pick-card{
-  flex:none; scroll-snap-align:start; width:148px; display:flex; flex-direction:column; gap:0; text-align:left;
-  background:var(--card-bg); border:1px solid var(--line); border-radius:14px; overflow:hidden; cursor:pointer;
+  display:flex; align-items:center; gap:10px; text-align:left; background:var(--card-bg); border:1px solid var(--line);
+  border-radius:14px; padding:10px 12px; cursor:pointer;
 }
 .pick-card[aria-pressed="true"]{ border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
-.pick-thumb{
+.pick-icon{
+  flex:none; width:34px; height:34px; border-radius:50%; background:var(--cat,var(--accent)); color:#fff;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.pick-icon svg{ width:16px; height:16px; }
+.pick-icon img{ width:100%; height:100%; object-fit:cover; }
+.pick-body{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+.pick-name{ font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pick-time{ font-size:12px; color:var(--muted); }
+
+/* Nearby places — swipeable strip of the broader OpenStreetMap directory (not Host picks) */
+.nearby-heading{ margin-top:26px; font-size:19px; display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+.nearby-heading .hint{ font-size:11.5px; font-weight:600; color:var(--muted); font-family:'Karla', sans-serif; white-space:nowrap; }
+.nearby-strip{
+  display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x proximity; margin-top:10px; padding:2px 2px 8px;
+}
+.nearby-card{
+  flex:none; scroll-snap-align:start; width:140px; display:flex; flex-direction:column; text-align:left;
+  background:var(--card-bg); border:1px solid var(--line); border-radius:14px; overflow:hidden; cursor:pointer;
+}
+.nearby-thumb{
   width:100%; aspect-ratio:4/3; background:var(--cat,var(--accent)); color:#fff;
   display:flex; align-items:center; justify-content:center; overflow:hidden;
 }
-.pick-thumb img{ width:100%; height:100%; object-fit:cover; }
-.pick-thumb svg{ width:26px; height:26px; opacity:0.9; }
-.pick-icon{
-  flex:none; width:34px; height:34px; border-radius:50%; background:var(--cat,var(--accent)); color:#fff;
-  display:flex; align-items:center; justify-content:center;
-}
-.pick-icon svg{ width:16px; height:16px; }
-.pick-body{ display:flex; flex-direction:column; gap:1px; min-width:0; padding:8px 10px 10px; }
-.pick-name{ font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.pick-time{ font-size:11.5px; color:var(--muted); }
+.nearby-thumb svg{ width:24px; height:24px; opacity:0.9; }
+.nearby-body{ display:flex; flex-direction:column; gap:1px; min-width:0; padding:8px 10px 10px; }
+.nearby-name{ font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.nearby-dist{ font-size:11px; color:var(--muted); }
 
 .panel{
   margin-top:14px; background:var(--card-bg); border:1px solid var(--line); border-radius:18px;
