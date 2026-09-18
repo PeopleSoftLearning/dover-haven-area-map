@@ -1,0 +1,412 @@
+{
+  "places": [
+    {
+      "id": "way-322523591",
+      "name": "Bliss Café",
+      "category": "Food & drink",
+      "lat": 13.066581,
+      "lng": -59.567072,
+      "image": "assets/places/bliss.webp",
+      "credit": {
+        "source": "https://www.minube.net/place/bliss-cafe-a3570445",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "way-384212066",
+      "name": "Café Sol",
+      "category": "Food & drink",
+      "lat": 13.068964,
+      "lng": -59.575567,
+      "image": "assets/places/cafe-sol.webp",
+      "credit": {
+        "source": "https://paddlebarbados.com/things-to-do-in-barbados/dining-in-barbados/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "node-10585472005",
+      "name": "Castaways",
+      "category": "Food & drink",
+      "lat": 13.068839,
+      "lng": -59.575875,
+      "image": "assets/places/castaways.webp",
+      "credit": {
+        "source": "https://castawaysbb.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "way-321521236",
+      "name": "Primo Bar & Bistro",
+      "category": "Food & drink",
+      "lat": 13.068001,
+      "lng": -59.575381,
+      "image": "assets/places/primo.webp",
+      "credit": {
+        "source": "https://www.primobarandbistro.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-cocktail-kitchen",
+      "name": "Cocktail Kitchen",
+      "category": "Food & drink",
+      "lat": 13.0680123,
+      "lng": -59.5750595,
+      "image": "assets/places/cocktail-kitchen.webp",
+      "credit": {
+        "source": "https://www.ckbarbados.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "node-2611288563",
+      "name": "Harlequin",
+      "category": "Food & drink",
+      "lat": 13.067737,
+      "lng": -59.573335,
+      "image": "assets/places/harlequin.webp",
+      "credit": {
+        "source": "https://www.harlequinrestaurant.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "node-9428064758",
+      "name": "Epic Surf Café",
+      "category": "Food & drink",
+      "lat": 13.067077,
+      "lng": -59.554711,
+      "image": "assets/places/epic.webp",
+      "credit": {
+        "source": "https://www.surfing-barbados.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "way-384229521",
+      "name": "Champers",
+      "category": "Food & drink",
+      "lat": 13.072184,
+      "lng": -59.586851,
+      "image": "assets/places/champers.webp",
+      "credit": {
+        "source": "https://www.visitbarbados.org/champers",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "way-384238479",
+      "name": "Tapas",
+      "category": "Food & drink",
+      "lat": 13.073871,
+      "lng": -59.594597,
+      "image": "assets/places/tapas.webp",
+      "credit": {
+        "source": "https://paddlebarbados.com/things-to-do-in-barbados/dining-in-barbados/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "node-3875288323",
+      "name": "Naru",
+      "category": "Food & drink",
+      "lat": 13.073772,
+      "lng": -59.592691,
+      "image": "assets/places/naru.webp",
+      "credit": {
+        "source": "https://www.narubarbados.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "way-384050115",
+      "name": "Surfers Café",
+      "category": "Food & drink",
+      "lat": 13.064493,
+      "lng": -59.54645,
+      "image": "assets/places/surfers-cafe.webp",
+      "credit": {
+        "source": "https://paddlebarbados.com/things-to-do-in-barbados/dining-in-barbados/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-artsplash-centre",
+      "name": "ArtSplash Centre",
+      "category": "Things to do",
+      "lat": 13.0758322,
+      "lng": -59.5973682,
+      "image": "assets/places/artsplash.webp",
+      "credit": {
+        "source": "https://artsplashbarbados.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-ride-the-tide",
+      "name": "Ride the Tide",
+      "category": "Surf & water",
+      "lat": 13.0548139,
+      "lng": -59.5353413,
+      "image": "assets/places/ride-tide.webp",
+      "credit": {
+        "source": "https://ridethetidebarbados.com/about-ride-the-tide-surf-school",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "node-5542983921",
+      "name": "Freights Bay",
+      "category": "Surf & water",
+      "lat": 13.052921,
+      "lng": -59.535234,
+      "image": "assets/places/freights.webp",
+      "credit": {
+        "source": "https://barbados.org/freights-bay-barbados.htm",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-zed-s-surfers-point",
+      "name": "Zed’s · Surfers Point",
+      "category": "Surf & water",
+      "lat": 13.052883,
+      "lng": -59.505667,
+      "image": "assets/places/zeds.webp",
+      "credit": {
+        "source": "https://www.zedssurfing.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "node-3459461895",
+      "name": "Paddle Barbados",
+      "category": "Surf & water",
+      "lat": 13.082361,
+      "lng": -59.60949,
+      "image": "assets/places/paddle.webp",
+      "credit": {
+        "source": "https://paddlebarbados.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-the-boatyard",
+      "name": "The Boatyard",
+      "category": "Things to do",
+      "lat": 13.093125,
+      "lng": -59.61259,
+      "image": "assets/places/boatyard.webp",
+      "credit": {
+        "source": "https://www.theboatyard.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "node-4527012790",
+      "name": "Harbour Lights",
+      "category": "Things to do",
+      "lat": 13.090078,
+      "lng": -59.609155,
+      "image": "assets/places/harbour-lights.webp",
+      "credit": {
+        "source": "https://harbourlightsbarbados.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "way-729726712",
+      "name": "George Washington House",
+      "category": "Things to do",
+      "lat": 13.081953,
+      "lng": -59.606754,
+      "image": "assets/places/washington.webp",
+      "credit": {
+        "source": "https://georgewashingtonbarbados.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "way-340269759",
+      "name": "Barbados Museum",
+      "category": "Things to do",
+      "lat": 13.08332,
+      "lng": -59.602135,
+      "image": "assets/places/museum.webp",
+      "credit": {
+        "source": "https://barbmuse.org.bb/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "node-2698561193",
+      "name": "Atlantis Submarines",
+      "category": "Things to do",
+      "lat": 13.10757,
+      "lng": -59.6254,
+      "image": "assets/places/atlantis.webp",
+      "credit": {
+        "source": "https://www.barbados.atlantissubmarines.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "node-438053403",
+      "name": "Harrison’s Cave",
+      "category": "Things to do",
+      "lat": 13.184819,
+      "lng": -59.573544,
+      "image": "assets/places/harrisons.webp",
+      "credit": {
+        "source": "https://chukka.com/barbados",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-bathsheba-soup-bowl",
+      "name": "Bathsheba & Soup Bowl",
+      "category": "Surf & water",
+      "lat": 13.214947,
+      "lng": -59.524897,
+      "image": "assets/places/bathsheba.webp",
+      "credit": {
+        "source": "https://www.visitbarbados.org/bathsheba-beach",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-caf-luna",
+      "name": "Café Luna",
+      "category": "Food & drink",
+      "lat": 13.059387,
+      "lng": -59.537911,
+      "image": "assets/places/luna.webp",
+      "credit": {
+        "source": "https://www.cafelunabarbados.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-maxwell-beach",
+      "name": "Maxwell Beach",
+      "category": "Beaches",
+      "lat": 13.064767,
+      "lng": -59.561613,
+      "image": "assets/places/maxwell-beach.webp",
+      "credit": {
+        "source": "https://commons.wikimedia.org/wiki/File:Paradise_-_panoramio_-_Dawid_Glawdzin.jpg",
+        "license": "CC BY 3.0"
+      }
+    },
+    {
+      "id": "photo-miami-beach",
+      "name": "Miami Beach",
+      "category": "Beaches",
+      "lat": 13.060782,
+      "lng": -59.540316,
+      "image": "assets/places/miami-beach.jpg",
+      "credit": {
+        "source": "https://commons.wikimedia.org/wiki/File:Miami_Beach,_Barbados.jpg",
+        "license": "Public domain"
+      }
+    },
+    {
+      "id": "photo-carlisle-bay",
+      "name": "Carlisle Bay",
+      "category": "Things to do",
+      "lat": 13.085,
+      "lng": -59.611,
+      "image": "assets/places/carlisle-bay.jpg",
+      "credit": {
+        "source": "https://commons.wikimedia.org/wiki/File:Carlisle_Bay,_Barbados.jpg",
+        "license": "CC0"
+      }
+    },
+    {
+      "id": "photo-rockley-beach",
+      "name": "Rockley Beach",
+      "category": "Beaches",
+      "lat": 13.07,
+      "lng": -59.58,
+      "image": "assets/places/rockley-beach.jpg",
+      "credit": {
+        "source": "https://commons.wikimedia.org/wiki/File:Accra_Beach,_Barbados_(53612524362).jpg",
+        "license": "CC BY-SA 2.0"
+      }
+    },
+    {
+      "id": "photo-irie-foods",
+      "name": "Irie Foods",
+      "category": "Food & drink",
+      "lat": 13.066368,
+      "lng": -59.566387,
+      "image": "assets/places/irie.webp",
+      "credit": {
+        "source": "https://www.insandoutsbarbados.com/restaurants/irie-foods",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-deia-beach-restaurant-beach-bar",
+      "name": "Deia Beach Restaurant & Beach Bar",
+      "category": "Food & drink",
+      "lat": 13.0682,
+      "lng": -59.5768,
+      "image": "assets/places/deia.webp",
+      "credit": {
+        "source": "https://deiabeach.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-golden-square-freedom-park",
+      "name": "Golden Square Freedom Park",
+      "category": "Things to do",
+      "lat": 13.0975,
+      "lng": -59.6146,
+      "image": "assets/places/golden-square.webp",
+      "credit": {
+        "source": "https://gisbarbados.gov.bb/blog/golden-square-freedom-park-opens/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-blakey-s-on-the-boardwalk",
+      "name": "Blakey's on the Boardwalk",
+      "category": "Food & drink",
+      "lat": 13.0872,
+      "lng": -59.6136,
+      "image": "assets/places/blakeys.webp",
+      "credit": {
+        "source": "https://blakeysbarbados.com/",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-the-tiki-bar",
+      "name": "The Tiki Bar",
+      "category": "Food & drink",
+      "lat": 13.078,
+      "lng": -59.6288,
+      "image": "assets/places/tiki.webp",
+      "credit": {
+        "source": "https://www.visitbarbados.org/tiki-bar",
+        "license": "Copyright retained by the original photographer/publisher; no open licence stated."
+      }
+    },
+    {
+      "id": "photo-grantley-adams-airport",
+      "name": "Grantley Adams Airport",
+      "category": "Getting around",
+      "lat": 13.07472,
+      "lng": -59.4925,
+      "image": "assets/places/airport.jpg",
+      "credit": {
+        "source": "https://commons.wikimedia.org/wiki/File:Grantley_Adams_International_Airport.jpg",
+        "license": "Public domain"
+      }
+    }
+  ]
+}

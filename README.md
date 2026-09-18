@@ -166,6 +166,54 @@ Jordan's idea of an LLM that answers guest questions about the property and area
 separate, larger piece of work (needs a backend to hold an API key and answer safely) — not included
 here. Worth a separate conversation once the map itself is live and settled.
 
+## Real photos on the directory map (34 places, 18 Sep)
+
+To match Jordan's site exactly — after checking his actual source code, not just his live screenshots
+— his ~950-place directory doesn't carry a photo per place either; only a curated subset of ~30-odd
+well-known local spots does (restaurants, beaches, attractions), sourced individually and credited in
+his own `docs/directory-photo-sources.json` / `public/image-credits.json`. That's the same model applied
+here: `data/photo-places.json` holds 34 of those places (matched into `data/directory.json` by
+OpenStreetMap id where possible), each with a real photo, now showing as photo pins/clusters on the map
+and in the "Nearby places" strip — everything else in the ~950-place directory stays a plain dot/count,
+same as on his site too.
+
+**Where these 34 photos came from — worth knowing, not uniform risk:**
+- **5 are safely, openly licensed** (Wikimedia Commons, CC0/CC BY/public domain): Maxwell Beach, Miami
+  Beach, Carlisle Bay, Rockley Beach, Grantley Adams Airport.
+- **~18 are each business's own official photo**, from their own website (Primo Bar & Bistro, Cocktail
+  Kitchen, Harlequin, Naru, Epic Surf Café, Café Luna, Deia Beach, Castaways, The Boatyard, Harbour
+  Lights, George Washington House, Barbados Museum, Atlantis Submarines, ArtSplash Centre, Ride the
+  Tide, Zed's · Surfers Point, Paddle Barbados, Blakey's on the Boardwalk) — the same lowest-risk
+  category as the rest of this README: a business's own promotional photo of itself is normal and
+  generally welcome.
+- **~11 are a third party's photo** — a travel-guide or tourism-board's own photography of the place,
+  not the business's own posted image (Bliss Café via minube.net, Café Sol/Tapas/Surfers Café via
+  paddlebarbados.com, Champers/Bathsheba & Soup Bowl/The Tiki Bar via visitbarbados.org, Irie Foods via
+  insandoutsbarbados.com, Golden Square Freedom Park via a government blog, Harrison's Cave via an
+  unrelated tour operator's site, Freights Bay via barbados.org). This is the riskier category flagged
+  elsewhere in this README — kept in for now (same low-stakes, non-commercial reasoning as the Dover
+  Beach photo), worth a second look if this site's profile grows.
+
+Full per-photo source/license is in `data/photo-places.json` (`credit` field on each entry).
+
+## Photos on the map itself
+
+Host picks with a photo now show it directly on the map pin — a round, white-ringed
+thumbnail (the same treatment the house pin always had), not just a flat icon
+droplet. Clicking any pin also pops a small on-map label near it ("Dover Beach ·
+4 min walk"), in addition to the fuller detail card that opens below — matching
+Jordan's on-map callout style, while keeping the richer photo/description/WhatsApp
+card as well.
+
+One real constraint, worth knowing: the free OpenStreetMap directory (the ~950
+"Nearby places" behind the map's clusters) is names, categories and coordinates
+only — it doesn't carry a photo per place. So directory clusters stay a round
+count-badge rather than a blended member photo; adding real per-place photos
+there would mean sourcing and licensing ~950 individual images, which isn't
+something to do automatically. Host picks (the ones Lena's actually recommending)
+are the ones that get the full photo-pin treatment, since those are the ones with
+real, rights-cleared photos attached.
+
 ## What was deliberately left out of Jordan's build
 
 Jordan's `barbadosrental` repo (private, shared for reference — nothing in it was copied verbatim or

@@ -66,15 +66,56 @@ h1,h2{ font-family:'Newsreader', Georgia, 'Times New Roman', serif; font-weight:
   display:flex; align-items:center; justify-content:center; cursor:pointer;
 }
 .map-pin svg{ width:16px; height:16px; transform:rotate(45deg); stroke:#fff; }
+/* A Host pick with a real photo gets a round, white-ringed photo pin on the map
+   itself — the same circular photo-marker treatment as the house pin — rather
+   than a flat icon droplet. Picks without a photo yet (e.g. the ATM) keep the
+   icon droplet above. */
+.map-pin--photo{
+  width:44px; height:44px; border-radius:50%; transform:none; border:3px solid var(--card-bg);
+  box-shadow:0 0 0 2px var(--cat,var(--accent)), var(--card-shadow); overflow:hidden; z-index:4;
+}
+.map-pin--photo img{ width:100%; height:100%; object-fit:cover; border-radius:50%; }
 .map-pin--house{
-  width:48px; height:48px; border-radius:50%; transform:none; border:3px solid var(--mark);
-  overflow:hidden; z-index:6;
+  width:52px; height:52px; border-radius:50%; transform:none; border:3px solid var(--mark);
+  box-shadow:0 0 0 2px var(--mark), var(--card-shadow); overflow:hidden; z-index:6;
 }
 .map-pin--house img{ width:100%; height:100%; object-fit:cover; border-radius:50%; }
 .map-pin--house svg{ transform:none; stroke:#fff; }
 .map-pin--active{ box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent), var(--card-shadow); z-index:5; }
+.map-pin--photo.map-pin--active{ box-shadow:0 0 0 3px color-mix(in srgb, var(--cat,var(--accent)) 55%, transparent), var(--card-shadow); }
 .map-pin--house.map-pin--active{ box-shadow:0 0 0 3px color-mix(in srgb, var(--mark) 55%, transparent), var(--card-shadow); }
 .maplibregl-ctrl-attrib{ display:none; }
+
+/* Directory points/clusters that turn out to have a real photo (the curated
+   subset — same sourcing Jordan's own site uses) get the same round photo-pin
+   treatment as a Host pick, just a touch smaller since there can be several
+   close together. */
+.map-pin--dir{ width:38px; height:38px; z-index:3; }
+
+/* A cluster with a photographed member — a round thumbnail with a white ring
+   and a small count badge, replacing the plain dark circle underneath it. */
+.photo-cluster{
+  width:52px; height:52px; border-radius:50%; border:3px solid var(--card-bg);
+  box-shadow:0 0 0 2px #3A362E, var(--card-shadow); overflow:hidden; position:relative;
+  padding:0; cursor:pointer; background:none; z-index:4;
+}
+.photo-cluster img{ width:100%; height:100%; object-fit:cover; display:block; }
+.photo-cluster-count{
+  position:absolute; bottom:-2px; right:-2px; background:#3A362E; color:#FBF7EF;
+  font-size:10px; font-weight:700; padding:2px 6px; border-radius:999px; border:2px solid var(--card-bg);
+}
+
+/* On-map pill label shown above a pin when it's clicked — "Dover Beach · 4 min
+   walk" — a compact, borderless popup rather than the full popup chrome used
+   for directory places. */
+.pin-label-popup .maplibregl-popup-tip{ display:none; }
+.pin-label-popup .maplibregl-popup-content{
+  background:var(--ink); color:var(--cream); padding:6px 12px; border-radius:999px;
+  box-shadow:0 8px 20px -6px rgba(0,0,0,0.4); white-space:nowrap;
+}
+.pin-label{ display:flex; align-items:baseline; gap:6px; font-size:12.5px; }
+.pin-label strong{ font-weight:700; }
+.pin-label span{ font-size:11px; opacity:0.8; }
 
 .photo--house{ position:relative; overflow:hidden; }
 .photo--house img{ width:100%; height:100%; object-fit:cover; }
@@ -109,14 +150,19 @@ h1,h2{ font-family:'Newsreader', Georgia, 'Times New Roman', serif; font-weight:
 }
 .pick-card[aria-pressed="true"]{ border-color:var(--accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
 .pick-icon{
-  flex:none; width:34px; height:34px; border-radius:50%; background:var(--cat,var(--accent)); color:#fff;
+  flex:none; width:38px; height:38px; border-radius:50%; background:var(--cat,var(--accent)); color:#fff;
   display:flex; align-items:center; justify-content:center; overflow:hidden;
+  box-shadow:0 0 0 2px color-mix(in srgb, var(--cat,var(--accent)) 35%, transparent);
 }
 .pick-icon svg{ width:16px; height:16px; }
 .pick-icon img{ width:100%; height:100%; object-fit:cover; }
+/* No thumbnail here — the photo already lives on the map pin. Just a category
+   dot, so the card stays quick to scan. */
+.pick-dot{ flex:none; width:11px; height:11px; border-radius:50%; background:var(--cat,var(--accent)); }
+.pick-go{ flex:none; margin-left:auto; color:var(--muted); font-size:15px; }
 .pick-body{ display:flex; flex-direction:column; gap:1px; min-width:0; }
-.pick-name{ font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.pick-time{ font-size:12px; color:var(--muted); }
+.pick-name{ font-weight:700; font-size:14px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pick-time{ font-size:12px; color:var(--muted); font-weight:600; }
 
 /* Nearby places — swipeable strip of the broader OpenStreetMap directory (not Host picks) */
 .nearby-heading{ margin-top:26px; font-size:19px; display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
@@ -133,6 +179,7 @@ h1,h2{ font-family:'Newsreader', Georgia, 'Times New Roman', serif; font-weight:
   display:flex; align-items:center; justify-content:center; overflow:hidden;
 }
 .nearby-thumb svg{ width:24px; height:24px; opacity:0.9; }
+.nearby-thumb--photo img{ width:100%; height:100%; object-fit:cover; }
 .nearby-body{ display:flex; flex-direction:column; gap:1px; min-width:0; padding:8px 10px 10px; }
 .nearby-name{ font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .nearby-dist{ font-size:11px; color:var(--muted); }
@@ -185,3 +232,8 @@ footer.credit a{ color:var(--accent); }
 .dir-popup h3{ font-family:'Newsreader', serif; font-weight:600; font-size:16px; margin:2px 0 4px; }
 .dir-popup p{ margin:0 0 8px; font-size:12.5px; color:var(--muted); }
 .cta.sm{ padding:6px 12px; font-size:12.5px; }
+.dir-popup--photo{ margin:-12px -14px 8px; }
+.dir-popup-photo{ width:100%; height:110px; object-fit:cover; display:block; border-radius:12px 12px 0 0; }
+.dir-popup--photo .dir-popup-cat{ margin:10px 14px 0; }
+.dir-popup--photo h3, .dir-popup--photo p{ margin-left:14px; margin-right:14px; }
+.dir-popup--photo .cta{ margin-left:14px; }

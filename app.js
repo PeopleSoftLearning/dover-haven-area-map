@@ -25,7 +25,9 @@
     "Beaches": "beach",
     "Food & drink": "food",
     "Essentials": "essentials",
-    "Things to do": "explore"
+    "Things to do": "explore",
+    "Surf & water": "explore",
+    "Getting around": "transport"
   };
 
   var filtersEl = document.getElementById("filters");
@@ -42,6 +44,10 @@
   var directoryPlaces = [];     // full OpenStreetMap directory (Essentials, Food & drink, Beaches, Things to do)
   var directoryById = {};
   var directoryLoaded = false;
+  var photographedPlaces = [];  // the subset of directoryPlaces that has a real photo attached
+  var photoIndexById = {};      // place id -> index into photographedPlaces (for cluster min-reduction)
+  var clusterMarkers = {};      // cluster_id -> DOM marker showing a representative photo
+  var photoPointMarkers = {};   // place id -> DOM marker for an unclustered photographed point
 
   // Free vector-tile basemap (no API key, no billing) — OpenStreetMap data
   // served by OpenFreeMap, the same free engine Jordan's site uses.
@@ -61,27 +67,41 @@
     return "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lng;
   }
 
-  function markerEl(cat, isHouse) {
+  // Photo-thumbnail pin for the house or a Host pick — matches Jordan's circular,
+  // white-ringed photo markers. Falls back to a category icon badge when a pick
+  // has no photo yet (e.g. the RBC ATM).
+  function markerEl(cat, isHouse, photoUrl) {
     var el = document.createElement("div");
-    el.className = "map-pin" + (isHouse ? " map-pin--house" : "");
+    var hasPhoto = !!photoUrl;
+    el.className = "map-pin" + (isHouse ? " map-pin--house" : "") + (hasPhoto ? " map-pin--photo" : "");
     el.style.setProperty("--cat", catColorVar(cat));
-    if (isHouse && house.photos && house.photos[0]) {
-      el.innerHTML = '<img src="' + house.photos[0] + '" alt="" />';
+    if (hasPhoto) {
+      el.innerHTML = '<img src="' + photoUrl + '" alt="" />';
     } else {
       el.innerHTML = ICONS[cat] || ICONS.essentials;
     }
     return el;
   }
 
+  // photoIndex mirrors Jordan's own pattern: every feature carries an index into
+  // photographedPlaces; a plain place gets the "no photo" sentinel (the array's
+  // length), so a cluster's ["min", photoIndex] reduction naturally picks a real
+  // photographed member when the cluster has one, and falls through to the
+  // sentinel (no photo) when it doesn't.
   function directoryGeoJSON(places) {
+    var sentinel = photographedPlaces.length;
     return {
       type: "FeatureCollection",
       features: places.map(function (p) {
+        var idx = photoIndexById.hasOwnProperty(p.id) ? photoIndexById[p.id] : sentinel;
         return {
           type: "Feature",
           id: p.id,
           geometry: { type: "Point", coordinates: [p.lng, p.lat] },
-          properties: { id: p.id, name: p.name, category: DIR_CAT_MAP[p.category] || "explore" }
+          properties: {
+            id: p.id, name: p.name, category: DIR_CAT_MAP[p.category] || "explore",
+            hasPhoto: idx < sentinel, photoIndex: idx
+          }
         };
       })
     };
@@ -93,9 +113,31 @@
       data: directoryGeoJSON(directoryPlaces),
       cluster: true,
       clusterMaxZoom: 16,
-      clusterRadius: 56
+      clusterRadius: 56,
+      // Same reduction Jordan's own site uses: the smallest photoIndex among a
+      // cluster's members, so a cluster with any photographed place inside picks
+      // that one's photo to represent the whole group.
+      clusterProperties: { photoIndex: ["min", ["get", "photoIndex"]] }
     });
 
+    // Cluster bubbles: a filled badge with a white ring, sized by count. Most of
+    // the free OpenStreetMap directory carries no photo per place, so this stays
+    // a plain count badge by default — but see updatePhotoMarkers() below, which
+    // overlays a real circular photo thumbnail on any cluster whose reduced
+    // photoIndex shows it has a photographed member, and on any unclustered
+    // photographed point — matching Jordan's photo-cluster/place-cluster split.
+    map.addLayer({
+      id: "dir-clusters-ring",
+      type: "circle",
+      source: "directory",
+      filter: ["has", "point_count"],
+      paint: {
+        "circle-color": "#ffffff",
+        "circle-radius": ["step", ["get", "point_count"], 18, 10, 21, 30, 24, 100, 28],
+        "circle-stroke-width": 3,
+        "circle-stroke-color": "#3A362E"
+      }
+    });
     map.addLayer({
       id: "dir-clusters",
       type: "circle",
@@ -103,7 +145,6 @@
       filter: ["has", "point_count"],
       paint: {
         "circle-color": "#3A362E",
-        "circle-opacity": 0.88,
         "circle-radius": ["step", ["get", "point_count"], 14, 10, 17, 30, 20, 100, 24]
       }
     });
@@ -131,32 +172,104 @@
       filter: ["!", ["has", "point_count"]],
       paint: {
         "circle-color": catColorExpr,
-        "circle-radius": 6,
-        "circle-stroke-width": 1.5,
+        "circle-radius": 8,
+        "circle-stroke-width": 2,
         "circle-stroke-color": "#ffffff"
       }
     });
 
-    map.on("click", "dir-clusters", function (e) {
-      var features = map.queryRenderedFeatures(e.point, { layers: ["dir-clusters"] });
+    function expandCluster(e) {
+      var features = map.queryRenderedFeatures(e.point, { layers: ["dir-clusters-ring"] });
+      if (!features.length) return;
       var clusterId = features[0].properties.cluster_id;
       map.getSource("directory").getClusterExpansionZoom(clusterId).then(function (zoom) {
         map.easeTo({ center: features[0].geometry.coordinates, zoom: zoom });
       }).catch(function () {});
-    });
+    }
+    map.on("click", "dir-clusters-ring", expandCluster);
+    map.on("click", "dir-clusters", expandCluster);
     map.on("click", "dir-points", function (e) {
       var f = e.features[0];
       var place = directoryById[f.properties.id];
       if (!place) return;
       showDirectoryPopup(place, f.properties.category);
     });
-    ["dir-clusters", "dir-points"].forEach(function (layerId) {
+    ["dir-clusters-ring", "dir-clusters", "dir-points"].forEach(function (layerId) {
       map.on("mouseenter", layerId, function () { map.getCanvas().style.cursor = "pointer"; });
       map.on("mouseleave", layerId, function () { map.getCanvas().style.cursor = ""; });
     });
 
+    map.on("render", updatePhotoMarkers);
+
     directoryLoaded = true;
     applyDirectoryFilter();
+  }
+
+  // Overlays real circular photo-thumbnail markers on top of the plain circle
+  // layers above — one per unclustered photographed point, and one per cluster
+  // that has a photographed member (using the same clusterProperties reduction
+  // Jordan's own site relies on). Everything else stays the flat dot/count
+  // badge underneath. Re-run on every render so markers track pan/zoom exactly
+  // like MapLibre's own layers do.
+  var photoMarkersPending = false;
+  function updatePhotoMarkers() {
+    if (photoMarkersPending || !map.isSourceLoaded("directory")) return;
+    photoMarkersPending = true;
+    requestAnimationFrame(function () {
+      photoMarkersPending = false;
+      var seenPoints = {}, seenClusters = {};
+      var features;
+      try { features = map.querySourceFeatures("directory"); } catch (e) { return; }
+
+      features.forEach(function (f) {
+        var props = f.properties;
+        if (props.cluster) {
+          var cid = props.cluster_id;
+          if (seenClusters[cid]) return;
+          seenClusters[cid] = true;
+          var idx = props.photoIndex;
+          var place = idx != null && idx < photographedPlaces.length ? photographedPlaces[idx] : null;
+          if (!place) return; // no photographed member — leave the plain count badge showing
+          if (!clusterMarkers[cid]) {
+            var el = document.createElement("button");
+            el.className = "photo-cluster";
+            el.innerHTML = '<img src="' + place.image + '" alt="" /><span class="photo-cluster-count"></span>';
+            el.addEventListener("click", function () {
+              map.getSource("directory").getClusterExpansionZoom(cid).then(function (zoom) {
+                map.easeTo({ center: f.geometry.coordinates, zoom: zoom });
+              }).catch(function () {});
+            });
+            clusterMarkers[cid] = new maplibregl.Marker({ element: el, anchor: "center" })
+              .setLngLat(f.geometry.coordinates)
+              .addTo(map);
+          }
+          clusterMarkers[cid].setLngLat(f.geometry.coordinates);
+          clusterMarkers[cid].getElement().querySelector(".photo-cluster-count").textContent = props.point_count_abbreviated || props.point_count;
+        } else if (props.hasPhoto) {
+          var id = props.id;
+          seenPoints[id] = true;
+          var p = directoryById[id];
+          if (!p || !p.image) return;
+          if (!photoPointMarkers[id]) {
+            var pel = document.createElement("div");
+            pel.className = "map-pin map-pin--photo map-pin--dir";
+            pel.style.setProperty("--cat", catColorVar(DIR_CAT_MAP[p.category] || "explore"));
+            pel.innerHTML = '<img src="' + p.image + '" alt="" />';
+            pel.addEventListener("click", function () { showDirectoryPopup(p, DIR_CAT_MAP[p.category] || "explore"); });
+            photoPointMarkers[id] = new maplibregl.Marker({ element: pel })
+              .setLngLat([p.lng, p.lat])
+              .addTo(map);
+          }
+        }
+      });
+
+      Object.keys(clusterMarkers).forEach(function (cid) {
+        if (!seenClusters[cid]) { clusterMarkers[cid].remove(); delete clusterMarkers[cid]; }
+      });
+      Object.keys(photoPointMarkers).forEach(function (id) {
+        if (!seenPoints[id]) { photoPointMarkers[id].remove(); delete photoPointMarkers[id]; }
+      });
+    });
   }
 
   function applyDirectoryFilter() {
@@ -177,7 +290,7 @@
     });
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
-    var houseEl = markerEl("house", true);
+    var houseEl = markerEl("house", true, house.photos && house.photos[0]);
     houseEl.title = "Dover Haven — you are here";
     houseEl.addEventListener("click", function () {
       if (openId === "house") closePanel(); else openPick("house");
@@ -187,7 +300,7 @@
       .addTo(map);
 
     picks.forEach(function (p) {
-      var el = markerEl(p.category, false);
+      var el = markerEl(p.category, false, p.photos && p.photos[0]);
       el.addEventListener("click", function () {
         if (openId === p.id) closePanel(); else openPick(p.id);
       });
@@ -224,25 +337,27 @@
     }).join("");
   }
 
+  // The photo already lives on the map pin, so a Host-pick card doesn't repeat
+  // it — just a category dot, name and time. Clicking a card flies to and opens
+  // that same pin on the map (see openPick/focusOnMap below).
   function renderPicks() {
     picksEl.innerHTML = picks.filter(function (p) {
       return activeCat === "all" || p.category === activeCat;
     }).map(function (p) {
-      var thumb = (p.photos && p.photos[0])
-        ? '<img src="' + p.photos[0] + '" alt="" />'
-        : (ICONS[p.category] || ICONS.essentials);
       return '<button class="pick-card" data-id="' + p.id + '" aria-pressed="' + (p.id === openId) + '">' +
-        '<span class="pick-icon" style="--cat:' + catColorVar(p.category) + '">' + thumb + '</span>' +
+        '<span class="pick-dot" style="--cat:' + catColorVar(p.category) + '"></span>' +
         '<span class="pick-body">' +
           '<span class="pick-name">' + p.name + '</span>' +
           '<span class="pick-time">' + p.timeLabel + '</span>' +
         '</span>' +
+        '<span class="pick-go" aria-hidden="true">&rarr;</span>' +
       '</button>';
     }).join("");
   }
 
   // "Nearby places" — swipeable strip pulled from the full OpenStreetMap directory
-  // (not Host picks), nearest first, matching Jordan's footer layout.
+  // (not Host picks). Photographed places surface first (real thumbnail, like
+  // Jordan's footer strip), then everything else nearest-first with an icon.
   var NEARBY_LIMIT = 40;
   function renderNearby() {
     if (!nearbyEl) return;
@@ -250,11 +365,17 @@
       return { p: p, km: distanceFromHouse(p.lat, p.lng), cat: DIR_CAT_MAP[p.category] || "explore" };
     }).filter(function (x) {
       return activeCat === "all" || x.cat === activeCat;
-    }).sort(function (a, b) { return a.km - b.km; }).slice(0, NEARBY_LIMIT);
+    }).sort(function (a, b) {
+      var aPhoto = a.p.image ? 1 : 0, bPhoto = b.p.image ? 1 : 0;
+      return bPhoto - aPhoto || a.km - b.km;
+    }).slice(0, NEARBY_LIMIT);
 
     nearbyEl.innerHTML = withDist.map(function (x) {
+      var thumb = x.p.image
+        ? '<img src="' + x.p.image + '" alt="" />'
+        : (ICONS[x.cat] || ICONS.essentials);
       return '<button class="nearby-card" data-id="' + x.p.id + '">' +
-        '<span class="nearby-thumb" style="--cat:' + catColorVar(x.cat) + '">' + (ICONS[x.cat] || ICONS.essentials) + '</span>' +
+        '<span class="nearby-thumb' + (x.p.image ? " nearby-thumb--photo" : "") + '" style="--cat:' + catColorVar(x.cat) + '">' + thumb + '</span>' +
         '<span class="nearby-body">' +
           '<span class="nearby-name">' + x.p.name + '</span>' +
           '<span class="nearby-dist">' + distanceLabel(x.km) + '</span>' +
@@ -264,10 +385,13 @@
   }
 
   function showDirectoryPopup(place, catId) {
+    hidePinLabel();
     var km = distanceFromHouse(place.lat, place.lng);
     var catInfo = CATS.filter(function (c) { return c.id === catId; })[0];
+    var photoHtml = place.image ? '<img class="dir-popup-photo" src="' + place.image + '" alt="" />' : "";
     var html =
-      '<div class="dir-popup">' +
+      '<div class="dir-popup' + (place.image ? " dir-popup--photo" : "") + '">' +
+        photoHtml +
         '<div class="dir-popup-cat">' + (catInfo ? catInfo.label : "") + '</div>' +
         '<h3>' + place.name + '</h3>' +
         '<p>' + distanceLabel(km) + '</p>' +
@@ -354,6 +478,7 @@
           '<a class="cta" href="' + whatsappUrl("Hi! I had a question about " + p.name + " near Dover Haven.") + '" target="_blank" rel="noopener">' +
             WHATSAPP_ICON + 'Ask about ' + p.name +
           '</a>' +
+          '<a class="cta ghost" href="' + directionsUrl(p.lat, p.lng) + '" target="_blank" rel="noopener">Directions &rarr;</a>' +
           '<a class="cta ghost" href="' + streetViewUrl(p) + '" target="_blank" rel="noopener">Street View &rarr;</a>' +
         '</div>' +
       '</div>';
@@ -377,14 +502,39 @@
     });
   }
 
+  // Small pill label that floats above a pin on click — "Dover Beach · 4 min walk" —
+  // the same on-map callout style as Jordan's site, shown in addition to (not instead
+  // of) the fuller detail card below.
+  var pinLabelPopup = null;
+  function showPinLabel(name, timeLabel, lngLat) {
+    if (!map) return;
+    if (pinLabelPopup) pinLabelPopup.remove();
+    var html = '<div class="pin-label"><strong>' + name + '</strong>' +
+      (timeLabel ? '<span>' + timeLabel + '</span>' : '') + '</div>';
+    pinLabelPopup = new maplibregl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      className: "pin-label-popup",
+      offset: 22,
+      anchor: "bottom"
+    }).setLngLat(lngLat).setHTML(html).addTo(map);
+  }
+  function hidePinLabel() {
+    if (pinLabelPopup) { pinLabelPopup.remove(); pinLabelPopup = null; }
+  }
+
   function openPick(id) {
     openId = id;
     galleryIndex = 0;
     if (id === "house") {
       focusOnHouse();
+      showPinLabel(house.name, "You are here", [house.lng, house.lat]);
     } else {
       var p = picks.filter(function (x) { return x.id === id; })[0];
-      if (p) focusOnMap(p);
+      if (p) {
+        focusOnMap(p);
+        showPinLabel(p.name, p.timeLabel, [p.lng, p.lat]);
+      }
     }
     renderPicks();
     renderPanel();
@@ -393,6 +543,7 @@
   }
   function closePanel() {
     openId = null;
+    hidePinLabel();
     focusOnHouse();
     renderPicks();
     renderPanel();
@@ -432,16 +583,38 @@
 
   Promise.all([
     fetch("data/pois.json").then(function (r) { return r.json(); }),
-    fetch("data/directory.json").then(function (r) { return r.json(); }).catch(function () { return { places: [] }; })
+    fetch("data/directory.json").then(function (r) { return r.json(); }).catch(function () { return { places: [] }; }),
+    fetch("data/photo-places.json").then(function (r) { return r.json(); }).catch(function () { return { places: [] }; })
   ])
     .then(function (results) {
       var data = results[0];
       var dir = results[1];
+      var photoData = results[2];
       house = data.house;
       picks = data.picks;
       directoryPlaces = dir.places || [];
       directoryById = {};
       directoryPlaces.forEach(function (p) { directoryById[p.id] = p; });
+
+      // Merge in the curated photo set (the same real-photo sourcing Jordan's own
+      // site uses — mostly each business's own official website): where a photo
+      // place matches an existing directory entry by id, attach the photo to it;
+      // otherwise add it as a new directory entry so it shows up on the map too.
+      (photoData.places || []).forEach(function (pp) {
+        var existing = directoryById[pp.id];
+        if (existing) {
+          existing.image = pp.image;
+          existing.credit = pp.credit;
+        } else {
+          var entry = { id: pp.id, name: pp.name, category: pp.category, lat: pp.lat, lng: pp.lng, image: pp.image, credit: pp.credit, description: "" };
+          directoryPlaces.push(entry);
+          directoryById[pp.id] = entry;
+        }
+      });
+      photographedPlaces = directoryPlaces.filter(function (p) { return !!p.image; });
+      photoIndexById = {};
+      photographedPlaces.forEach(function (p, i) { photoIndexById[p.id] = i; });
+
       renderFilters();
       renderPicks();
       renderNearby();
