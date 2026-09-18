@@ -43,8 +43,8 @@
       "id": "gap",
       "name": "St Lawrence Gap",
       "category": "food",
-      "lat": 13.06406,
-      "lng": -59.55552,
+      "lat": 13.0661,
+      "lng": -59.56564,
       "timeLabel": "Short walk along Dover Road",
       "description": "Restaurants, rum shops and live music — somewhere to eat at almost any hour. Lively in the evening, quiet again by the time you're back in bed.",
       "photos": [
@@ -55,8 +55,8 @@
       "id": "oistins",
       "name": "Oistins Fish Fry",
       "category": "food",
-      "lat": 13.05416,
-      "lng": -59.50312,
+      "lat": 13.06444,
+      "lng": -59.54444,
       "timeLabel": "~10 min drive",
       "description": "Go on a Friday night for the fish fry — it's the one thing everybody tells guests to do, and they're right.",
       "photos": [
@@ -67,8 +67,8 @@
       "id": "airport",
       "name": "Grantley Adams Airport",
       "category": "transport",
-      "lat": 13.06646,
-      "lng": -59.46092,
+      "lat": 13.07472,
+      "lng": -59.49250,
       "timeLabel": "~15 min",
       "description": "A transfer can be arranged in advance — just ask when you book.",
       "photos": [

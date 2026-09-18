@@ -25,6 +25,7 @@
   var openId = null;
   var house, picks = [];
   var map, markers = {};
+  var houseGalleryIndex = 0;
 
   // Free vector-tile basemap (no API key, no billing) — OpenStreetMap data
   // served by OpenFreeMap, the same free engine Jordan's site uses.
@@ -34,7 +35,11 @@
     var el = document.createElement("div");
     el.className = "map-pin" + (isHouse ? " map-pin--house" : "");
     el.style.setProperty("--cat", catColorVar(cat));
-    el.innerHTML = ICONS[cat] || ICONS.shop;
+    if (isHouse && house.photos && house.photos[0]) {
+      el.innerHTML = '<img src="' + house.photos[0] + '" alt="" />';
+    } else {
+      el.innerHTML = ICONS[cat] || ICONS.shop;
+    }
     return el;
   }
 
@@ -49,7 +54,10 @@
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
     var houseEl = markerEl("house", true);
-    houseEl.addEventListener("click", function () { closePanel(); });
+    houseEl.title = "Dover Haven — you are here";
+    houseEl.addEventListener("click", function () {
+      if (openId === "house") closePanel(); else openPick("house");
+    });
     markers.house = new maplibregl.Marker({ element: houseEl })
       .setLngLat([house.lng, house.lat])
       .addTo(map);
@@ -110,9 +118,43 @@
     return "https://www.google.com/maps?q=" + p.lat + "," + p.lng;
   }
 
+  function whatsappUrl(text) {
+    return WHATSAPP + "?text=" + encodeURIComponent(text);
+  }
+  var WHATSAPP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1s-.6.8-.7.9c-.1.1-.3.2-.5.1a6.5 6.5 0 0 1-1.9-1.2 7.1 7.1 0 0 1-1.3-1.6c-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4a.5.5 0 0 0 0-.5c-.1-.1-.5-1.3-.7-1.7-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.9 2 4.7 4.7 0 0 0 1 2.5 10.7 10.7 0 0 0 4.1 3.6c.6.2 1 .4 1.4.5a3.4 3.4 0 0 0 1.5.1 2.5 2.5 0 0 0 1.6-1.1 1.9 1.9 0 0 0 .1-1.1c-.1-.1-.2-.2-.4-.3z"/></svg>';
+
+  function renderHousePanel() {
+    var photos = house.photos || [];
+    var i = photos.length ? (((houseGalleryIndex % photos.length) + photos.length) % photos.length) : 0;
+    var navBtns = photos.length > 1
+      ? '<button class="gal-nav gal-prev" aria-label="Previous photo">&larr;</button>' +
+        '<button class="gal-nav gal-next" aria-label="Next photo">&rarr;</button>' +
+        '<span class="gal-count">' + (i + 1) + ' / ' + photos.length + '</span>'
+      : "";
+    panel.innerHTML =
+      '<div class="photo photo--house" style="--cat:var(--mark)">' +
+        (photos[i] ? '<img src="' + photos[i] + '" alt="' + house.name + '" />' : ICONS.house) +
+        navBtns +
+      '</div>' +
+      '<div class="body">' +
+        '<div class="row1">' +
+          '<div><div class="cat-tag" style="--cat:var(--mark)">Your stay</div><h2>' + house.name + '</h2></div>' +
+          '<button class="close-btn" aria-label="Close">&times;</button>' +
+        '</div>' +
+        '<span class="time-badge">You are here</span>' +
+        '<p class="desc">' + house.description + '</p>' +
+        '<div class="btn-row">' +
+          '<a class="cta" href="' + whatsappUrl("Hi! I had a question about Dover Haven.") + '" target="_blank" rel="noopener">' +
+            WHATSAPP_ICON + 'Ask a question' +
+          '</a>' +
+        '</div>' +
+      '</div>';
+  }
+
   function renderPanel() {
     if (!openId) { panel.innerHTML = ""; panel.style.display = "none"; return; }
     panel.style.display = "";
+    if (openId === "house") { renderHousePanel(); return; }
     var p = picks.filter(function (x) { return x.id === openId; })[0];
     if (!p) return;
     var catInfo = CATS.filter(function (c) { return c.id === p.category; })[0];
@@ -129,9 +171,8 @@
         '<span class="time-badge">' + p.timeLabel + '</span>' +
         '<p class="desc">' + p.description + '</p>' +
         '<div class="btn-row">' +
-          '<a class="cta" href="' + WHATSAPP + '?text=' + encodeURIComponent("Hi! I had a question about " + p.name + " near Dover Haven.") + '" target="_blank" rel="noopener">' +
-            '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1s-.6.8-.7.9c-.1.1-.3.2-.5.1a6.5 6.5 0 0 1-1.9-1.2 7.1 7.1 0 0 1-1.3-1.6c-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4a.5.5 0 0 0 0-.5c-.1-.1-.5-1.3-.7-1.7-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.6.3 2.7 2.7 0 0 0-.9 2 4.7 4.7 0 0 0 1 2.5 10.7 10.7 0 0 0 4.1 3.6c.6.2 1 .4 1.4.5a3.4 3.4 0 0 0 1.5.1 2.5 2.5 0 0 0 1.6-1.1 1.9 1.9 0 0 0 .1-1.1c-.1-.1-.2-.2-.4-.3z"/></svg>' +
-            'Ask about ' + p.name +
+          '<a class="cta" href="' + whatsappUrl("Hi! I had a question about " + p.name + " near Dover Haven.") + '" target="_blank" rel="noopener">' +
+            WHATSAPP_ICON + 'Ask about ' + p.name +
           '</a>' +
           '<a class="cta ghost" href="' + streetViewUrl(p) + '" target="_blank" rel="noopener">Street View &rarr;</a>' +
         '</div>' +
@@ -158,8 +199,13 @@
 
   function openPick(id) {
     openId = id;
-    var p = picks.filter(function (x) { return x.id === id; })[0];
-    if (p) focusOnMap(p);
+    if (id === "house") {
+      houseGalleryIndex = 0;
+      focusOnHouse();
+    } else {
+      var p = picks.filter(function (x) { return x.id === id; })[0];
+      if (p) focusOnMap(p);
+    }
     renderPicks();
     renderPanel();
     markActiveMarker();
@@ -172,6 +218,11 @@
     renderPanel();
     markActiveMarker();
   }
+
+  panel.addEventListener("click", function (e) {
+    if (e.target.closest(".gal-prev")) { houseGalleryIndex--; renderHousePanel(); }
+    if (e.target.closest(".gal-next")) { houseGalleryIndex++; renderHousePanel(); }
+  });
 
   filtersEl.addEventListener("click", function (e) {
     var btn = e.target.closest(".chip");
